@@ -1,964 +1,1282 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Alfa Chat V3</title>
-  <meta name="description" content="Alfa Chat V3 - Simulasi aplikasi chat modern berbasis web.">
-
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    :root {
-      --primary: #075e54;
-      --primary-light: #128c7e;
-      --accent: #25d366;
-      --bg: #efeae2;
-      --card: #ffffff;
-      --text: #111b21;
-      --muted: #667781;
-      --border: #e9edef;
-      --bubble-me: #d9fdd3;
-      --bubble-other: #ffffff;
-      --header: #075e54;
-      --input: #ffffff;
-      --danger: #e53935;
-    }
-
-    body.dark {
-      --bg: #111b21;
-      --card: #202c33;
-      --text: #e9edef;
-      --muted: #8696a0;
-      --border: #374045;
-      --bubble-me: #005c4b;
-      --bubble-other: #202c33;
-      --header: #202c33;
-      --input: #2a3942;
-    }
-
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      background: #d7dbd5;
-      color: var(--text);
-      min-height: 100vh;
-    }
-
-    button,
-    input {
-      font: inherit;
-    }
-
-    button {
-      border: 0;
-      cursor: pointer;
-    }
-
-    .app {
-      width: 100%;
-      max-width: 480px;
-      min-height: 100vh;
-      margin: auto;
-      background: var(--bg);
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 0 25px rgba(0,0,0,.15);
-    }
-
-    /* ================= HEADER ================= */
-
-    .top-header {
-      background: var(--header);
-      color: white;
-      padding: 18px 16px 12px;
-      position: sticky;
-      top: 0;
-      z-index: 20;
-    }
-
-    .header-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .brand {
-      font-size: 23px;
-      font-weight: bold;
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 6px;
-    }
-
-    .icon-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: transparent;
-      color: white;
-      font-size: 21px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .icon-btn:hover {
-      background: rgba(255,255,255,.15);
-    }
-
-    /* ================= SEARCH ================= */
-
-    .search-box {
-      margin-top: 13px;
-      background: rgba(255,255,255,.15);
-      border-radius: 22px;
-      display: flex;
-      align-items: center;
-      padding: 0 13px;
-    }
-
-    .search-box span {
-      font-size: 18px;
-    }
-
-    .search-box input {
-      width: 100%;
-      background: transparent;
-      border: 0;
-      outline: none;
-      padding: 11px;
-      color: white;
-    }
-
-    .search-box input::placeholder {
-      color: rgba(255,255,255,.75);
-    }
-
-    /* ================= TABS ================= */
-
-    .tabs {
-      display: flex;
-      margin-top: 12px;
-      gap: 5px;
-    }
-
-    .tab {
-      flex: 1;
-      padding: 9px 5px;
-      border-radius: 18px;
-      background: transparent;
-      color: rgba(255,255,255,.75);
-      font-weight: bold;
-      font-size: 13px;
-    }
-
-    .tab.active {
-      background: rgba(255,255,255,.18);
-      color: white;
-    }
-
-    /* ================= CHAT LIST ================= */
-
-    .content {
-      padding-bottom: 75px;
-    }
-
-    .section-title {
-      padding: 15px 16px 7px;
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-
-    .chat-item {
-      display: flex;
-      align-items: center;
-      padding: 13px 15px;
-      gap: 12px;
-      background: var(--card);
-      border-bottom: 1px solid var(--border);
-      cursor: pointer;
-      transition: .15s;
-    }
-
-    .chat-item:hover {
-      filter: brightness(.97);
-    }
-
-    .avatar {
-      width: 52px;
-      height: 52px;
-      flex-shrink: 0;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #128c7e, #25d366);
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-weight: bold;
-      font-size: 19px;
-      position: relative;
-    }
-
-    .online-dot {
-      width: 13px;
-      height: 13px;
-      border: 2px solid var(--card);
-      background: #25d366;
-      border-radius: 50%;
-      position: absolute;
-      right: 0;
-      bottom: 1px;
-    }
-
-    .chat-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .chat-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
-    }
-
-    .chat-name {
-      font-weight: bold;
-      font-size: 16px;
-    }
-
-    .chat-time {
-      color: var(--muted);
-      font-size: 11px;
-      white-space: nowrap;
-    }
-
-    .chat-preview {
-      color: var(--muted);
-      font-size: 13px;
-      margin-top: 5px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .unread {
-      min-width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: #fff;
-      font-size: 11px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-top: 7px;
-    }
-
-    /* ================= BOTTOM NAV ================= */
-
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      max-width: 480px;
-      height: 68px;
-      background: var(--card);
-      border-top: 1px solid var(--border);
-      display: flex;
-      z-index: 30;
-    }
-
-    .nav-btn {
-      flex: 1;
-      background: transparent;
-      color: var(--muted);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      font-size: 11px;
-    }
-
-    .nav-btn span:first-child {
-      font-size: 22px;
-    }
-
-    .nav-btn.active {
-      color: var(--primary-light);
-      font-weight: bold;
-    }
-
-    /* ================= CHAT SCREEN ================= */
-
-    .chat-screen {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: var(--bg);
-      z-index: 100;
-    }
-
-    .chat-screen.active {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .chat-header {
-      height: 66px;
-      background: var(--header);
-      color: white;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 10px;
-    }
-
-    .back-btn {
-      width: 38px;
-      height: 42px;
-      background: transparent;
-      color: white;
-      font-size: 25px;
-    }
-
-    .chat-header-avatar {
-      width: 43px;
-      height: 43px;
-      border-radius: 50%;
-      background: linear-gradient(135deg,#128c7e,#25d366);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-    }
-
-    .chat-header-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .chat-header-name {
-      font-weight: bold;
-      font-size: 15px;
-    }
-
-    .chat-status {
-      font-size: 11px;
-      opacity: .8;
-      margin-top: 2px;
-    }
-
-    .chat-header-actions {
-      display: flex;
-      gap: 3px;
-    }
-
-    .chat-header-actions button {
-      width: 36px;
-      height: 40px;
-      background: transparent;
-      color: white;
-      font-size: 19px;
-      border-radius: 50%;
-    }
-
-    .chat-header-actions button:hover {
-      background: rgba(255,255,255,.15);
-    }
-
-    /* ================= MESSAGES ================= */
-
-    .messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 18px 10px 10px;
-      background:
-        radial-gradient(rgba(0,0,0,.04) 1px, transparent 1px),
-        var(--bg);
-      background-size: 15px 15px;
-    }
-
-    .date-label {
-      width: max-content;
-      margin: 0 auto 15px;
-      background: rgba(255,255,255,.7);
-      color: #667781;
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 11px;
-    }
-
-    body.dark .date-label {
-      background: #202c33;
-    }
-
-    .message-row {
-      display: flex;
-      margin-bottom: 7px;
-    }
-
-    .message-row.me {
-      justify-content: flex-end;
-    }
-
-    .message {
-      max-width: 78%;
-      padding: 8px 9px 5px;
-      border-radius: 9px;
-      background: var(--bubble-other);
-      box-shadow: 0 1px 1px rgba(0,0,0,.08);
-      position: relative;
-    }
-
-    .message-row.me .message {
-      background: var(--bubble-me);
-      border-top-right-radius: 2px;
-    }
-
-    .message-row.other .message {
-      border-top-left-radius: 2px;
-    }
-
-    .message-text {
-      font-size: 14px;
-      line-height: 1.4;
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
-      padding-right: 45px;
-    }
-
-    .message-meta {
-      float: right;
-      display: flex;
-      align-items: center;
-      gap: 3px;
-      margin-left: 7px;
-      margin-top: 4px;
-      font-size: 10px;
-      color: var(--muted);
-    }
-
-    .ticks {
-      color: #53bdeb;
-      font-weight: bold;
-    }
-
-    .message-menu {
-      position: absolute;
-      right: 5px;
-      top: 28px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      box-shadow: 0 5px 18px rgba(0,0,0,.2);
-      display: none;
-      z-index: 10;
-      min-width: 125px;
-      overflow: hidden;
-    }
-
-    .message-menu.show {
-      display: block;
-    }
-
-    .message-menu button {
-      display: block;
-      width: 100%;
-      padding: 10px;
-      text-align: left;
-      background: transparent;
-      color: var(--text);
-    }
-
-    .message-menu button:hover {
-      background: rgba(0,0,0,.06);
-    }
-
-    /* ================= TYPING ================= */
-
-    .typing {
-      display: none;
-      padding: 4px 13px 7px;
-      color: var(--muted);
-      font-size: 11px;
-      background: var(--bg);
-    }
-
-    .typing.show {
-      display: block;
-    }
-
-    /* ================= INPUT ================= */
-
-    .chat-input-area {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 7px;
-      background: var(--bg);
-    }
-
-    .input-wrap {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      background: var(--input);
-      border-radius: 23px;
-      min-height: 46px;
-      padding: 0 7px;
-    }
-
-    .input-wrap button {
-      width: 35px;
-      height: 35px;
-      background: transparent;
-      color: var(--muted);
-      font-size: 21px;
-      border-radius: 50%;
-    }
-
-    .input-wrap input {
-      flex: 1;
-      border: 0;
-      outline: 0;
-      background: transparent;
-      color: var(--text);
-      padding: 9px 5px;
-    }
-
-    .send-btn {
-      width: 46px;
-      height: 46px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: white;
-      font-size: 20px;
-    }
-
-    /* ================= SETTINGS ================= */
-
-    .settings {
-      display: none;
-    }
-
-    .settings.active {
-      display: block;
-    }
-
-    .profile-card {
-      background: var(--card);
-      padding: 22px;
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .profile-avatar {
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      background: linear-gradient(135deg,#075e54,#25d366);
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 26px;
-      font-weight: bold;
-    }
-
-    .profile-name {
-      font-size: 20px;
-      font-weight: bold;
-    }
-
-    .profile-status {
-      color: var(--muted);
-      font-size: 13px;
-      margin-top: 5px;
-    }
-
-    .setting-item {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      padding: 16px;
-      background: var(--card);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .setting-icon {
-      width: 35px;
-      text-align: center;
-      font-size: 22px;
-    }
-
-    .setting-info {
-      flex: 1;
-    }
-
-    .setting-title {
-      font-weight: bold;
-      font-size: 14px;
-    }
-
-    .setting-desc {
-      color: var(--muted);
-      font-size: 12px;
-      margin-top: 3px;
-    }
-
-    .toggle {
-      width: 47px;
-      height: 25px;
-      border-radius: 20px;
-      background: #aeb7bd;
-      padding: 3px;
-      transition: .2s;
-    }
-
-    .toggle::after {
-      content: "";
-      display: block;
-      width: 19px;
-      height: 19px;
-      border-radius: 50%;
-      background: white;
-      transition: .2s;
-    }
-
-    .toggle.on {
-      background: var(--accent);
-    }
-
-    .toggle.on::after {
-      transform: translateX(22px);
-    }
-
-    .danger {
-      color: var(--danger);
-    }
-
-    /* ================= MODAL ================= */
-
-    .modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.55);
-      z-index: 300;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .modal.show {
-      display: flex;
-    }
-
-    .modal-box {
-      width: 100%;
-      max-width: 360px;
-      background: var(--card);
-      color: var(--text);
-      border-radius: 15px;
-      padding: 20px;
-      box-shadow: 0 15px 50px rgba(0,0,0,.3);
-    }
-
-    .modal-box h3 {
-      margin-bottom: 10px;
-    }
-
-    .modal-box p {
-      color: var(--muted);
-      line-height: 1.5;
-      font-size: 14px;
-    }
-
-    .modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-      margin-top: 18px;
-    }
-
-    .modal-actions button {
-      padding: 9px 14px;
-      border-radius: 8px;
-      background: var(--primary-light);
-      color: white;
-    }
-
-    .modal-actions .cancel {
-      background: transparent;
-      color: var(--muted);
-    }
-
-    /* ================= EMPTY ================= */
-
-    .empty {
-      text-align: center;
-      padding: 50px 20px;
-      color: var(--muted);
-    }
-
-    .empty-icon {
-      font-size: 45px;
-      margin-bottom: 10px;
-    }
-
-    /* ================= TOAST ================= */
-
-    .toast {
-      position: fixed;
-      left: 50%;
-      bottom: 85px;
-      transform: translate(-50%, 20px);
-      background: #323232;
-      color: white;
-      padding: 10px 15px;
-      border-radius: 20px;
-      font-size: 13px;
-      opacity: 0;
-      pointer-events: none;
-      transition: .25s;
-      z-index: 500;
-      max-width: 90%;
-      text-align: center;
-    }
-
-    .toast.show {
-      opacity: 1;
-      transform: translate(-50%, 0);
-    }
-
-    /* ================= DESKTOP ================= */
-
-    @media (min-width: 700px) {
-      .app {
-        min-height: 100vh;
-      }
-
-      .chat-screen {
-        width: 480px;
-        left: 50%;
-        transform: translateX(-50%);
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Alfa Chat V4</title>
+<meta name="description" content="Alfa Chat V4 - Simulasi aplikasi chat modern Alfa Design.">
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+:root{
+  --primary:#075e54;
+  --primary2:#128c7e;
+  --accent:#25d366;
+  --bg:#efeae2;
+  --card:#fff;
+  --text:#111b21;
+  --muted:#667781;
+  --border:#e9edef;
+  --mine:#d9fdd3;
+  --other:#fff;
+  --danger:#e53935;
+  --input:#fff;
+  --shadow:0 8px 25px rgba(0,0,0,.15);
+}
+
+body.dark{
+  --bg:#111b21;
+  --card:#202c33;
+  --text:#e9edef;
+  --muted:#8696a0;
+  --border:#374045;
+  --mine:#005c4b;
+  --other:#202c33;
+  --input:#2a3942;
+}
+
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:#d7dbd5;
+  color:var(--text);
+  min-height:100vh;
+}
+
+button,input{
+  font:inherit;
+}
+
+button{
+  border:0;
+  cursor:pointer;
+}
+
+.app{
+  width:100%;
+  max-width:480px;
+  min-height:100vh;
+  margin:auto;
+  background:var(--bg);
+  position:relative;
+  overflow:hidden;
+  box-shadow:0 0 30px rgba(0,0,0,.15);
+}
+
+/* HEADER */
+
+.top-header{
+  background:var(--primary);
+  color:white;
+  padding:18px 15px 12px;
+  position:sticky;
+  top:0;
+  z-index:20;
+}
+
+.header-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.brand{
+  font-size:23px;
+  font-weight:bold;
+}
+
+.header-actions{
+  display:flex;
+  gap:4px;
+}
+
+.icon-btn{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  background:transparent;
+  color:white;
+  font-size:20px;
+}
+
+.icon-btn:hover{
+  background:rgba(255,255,255,.15);
+}
+
+/* SEARCH */
+
+.search-box{
+  margin-top:12px;
+  background:rgba(255,255,255,.15);
+  border-radius:24px;
+  display:flex;
+  align-items:center;
+  padding:0 13px;
+}
+
+.search-box input{
+  flex:1;
+  border:0;
+  outline:0;
+  background:transparent;
+  color:white;
+  padding:11px;
+}
+
+.search-box input::placeholder{
+  color:rgba(255,255,255,.75);
+}
+
+/* TABS */
+
+.tabs{
+  display:flex;
+  gap:5px;
+  margin-top:11px;
+}
+
+.tab{
+  flex:1;
+  padding:9px 4px;
+  border-radius:18px;
+  background:transparent;
+  color:rgba(255,255,255,.75);
+  font-size:12px;
+  font-weight:bold;
+}
+
+.tab.active{
+  background:rgba(255,255,255,.18);
+  color:white;
+}
+
+/* CONTENT */
+
+.content{
+  padding-bottom:75px;
+}
+
+.section-title{
+  padding:15px 16px 7px;
+  color:var(--muted);
+  font-size:12px;
+  font-weight:bold;
+  text-transform:uppercase;
+}
+
+/* CHAT ITEM */
+
+.chat-item{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:13px 15px;
+  background:var(--card);
+  border-bottom:1px solid var(--border);
+  cursor:pointer;
+}
+
+.chat-item:hover{
+  filter:brightness(.97);
+}
+
+.avatar{
+  width:53px;
+  height:53px;
+  border-radius:50%;
+  flex-shrink:0;
+  background:linear-gradient(135deg,#128c7e,#25d366);
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+  position:relative;
+}
+
+.online-dot{
+  position:absolute;
+  width:13px;
+  height:13px;
+  right:0;
+  bottom:1px;
+  border-radius:50%;
+  background:#25d366;
+  border:2px solid var(--card);
+}
+
+.chat-info{
+  flex:1;
+  min-width:0;
+}
+
+.chat-top{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+}
+
+.chat-name{
+  font-weight:bold;
+}
+
+.chat-time{
+  color:var(--muted);
+  font-size:10px;
+  white-space:nowrap;
+}
+
+.chat-preview{
+  color:var(--muted);
+  font-size:13px;
+  margin-top:5px;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+
+.chat-right{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:5px;
+}
+
+.unread{
+  min-width:20px;
+  height:20px;
+  border-radius:50%;
+  background:var(--accent);
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:10px;
+}
+
+.pin{
+  color:var(--muted);
+  font-size:13px;
+}
+
+/* BOTTOM */
+
+.bottom-nav{
+  position:fixed;
+  bottom:0;
+  width:100%;
+  max-width:480px;
+  height:68px;
+  background:var(--card);
+  border-top:1px solid var(--border);
+  display:flex;
+  z-index:30;
+}
+
+.nav-btn{
+  flex:1;
+  background:transparent;
+  color:var(--muted);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  font-size:11px;
+}
+
+.nav-btn span{
+  font-size:21px;
+}
+
+.nav-btn.active{
+  color:var(--primary2);
+  font-weight:bold;
+}
+
+/* CHAT SCREEN */
+
+.chat-screen{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:var(--bg);
+  z-index:100;
+}
+
+.chat-screen.active{
+  display:flex;
+  flex-direction:column;
+}
+
+.chat-header{
+  height:66px;
+  background:var(--primary);
+  color:white;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:7px 9px;
+}
+
+.back-btn{
+  width:38px;
+  height:42px;
+  color:white;
+  background:transparent;
+  font-size:28px;
+}
+
+.chat-header-avatar{
+  width:43px;
+  height:43px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#128c7e,#25d366);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+}
+
+.chat-header-info{
+  flex:1;
+  min-width:0;
+}
+
+.chat-header-name{
+  font-size:15px;
+  font-weight:bold;
+}
+
+.chat-status{
+  font-size:11px;
+  opacity:.8;
+  margin-top:2px;
+}
+
+.chat-header-actions{
+  display:flex;
+}
+
+.chat-header-actions button{
+  width:36px;
+  height:40px;
+  color:white;
+  background:transparent;
+  font-size:18px;
+}
+
+/* MESSAGES */
+
+.messages{
+  flex:1;
+  overflow-y:auto;
+  padding:18px 10px 10px;
+  background:
+    radial-gradient(rgba(0,0,0,.04) 1px,transparent 1px),
+    var(--bg);
+  background-size:15px 15px;
+}
+
+.date-label{
+  width:max-content;
+  margin:0 auto 15px;
+  background:rgba(255,255,255,.75);
+  color:#667781;
+  padding:6px 12px;
+  border-radius:8px;
+  font-size:11px;
+}
+
+body.dark .date-label{
+  background:#202c33;
+}
+
+.message-row{
+  display:flex;
+  margin-bottom:7px;
+}
+
+.message-row.me{
+  justify-content:flex-end;
+}
+
+.message{
+  max-width:78%;
+  min-width:60px;
+  padding:8px 9px 5px;
+  border-radius:9px;
+  background:var(--other);
+  box-shadow:0 1px 1px rgba(0,0,0,.08);
+  position:relative;
+}
+
+.message-row.me .message{
+  background:var(--mine);
+  border-top-right-radius:2px;
+}
+
+.message-row.other .message{
+  border-top-left-radius:2px;
+}
+
+.message.favorite{
+  box-shadow:0 0 0 2px #ffd54f;
+}
+
+.message-text{
+  font-size:14px;
+  line-height:1.4;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  padding-right:43px;
+}
+
+.message-meta{
+  float:right;
+  display:flex;
+  align-items:center;
+  gap:3px;
+  margin-left:7px;
+  margin-top:4px;
+  font-size:10px;
+  color:var(--muted);
+}
+
+.ticks{
+  color:#53bdeb;
+  font-weight:bold;
+}
+
+.star{
+  color:#ffc107;
+}
+
+/* MESSAGE MENU */
+
+.message-menu{
+  position:absolute;
+  right:5px;
+  top:28px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:8px;
+  box-shadow:var(--shadow);
+  display:none;
+  min-width:145px;
+  z-index:15;
+  overflow:hidden;
+}
+
+.message-menu.show{
+  display:block;
+}
+
+.message-menu button{
+  width:100%;
+  padding:10px;
+  text-align:left;
+  background:transparent;
+  color:var(--text);
+  font-size:13px;
+}
+
+.message-menu button:hover{
+  background:rgba(0,0,0,.06);
+}
+
+/* TYPING */
+
+.typing{
+  display:none;
+  padding:4px 13px 7px;
+  color:var(--muted);
+  font-size:11px;
+  background:var(--bg);
+}
+
+.typing.show{
+  display:block;
+}
+
+/* INPUT */
+
+.chat-input-area{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:7px;
+  background:var(--bg);
+  position:relative;
+}
+
+.input-wrap{
+  flex:1;
+  min-height:46px;
+  border-radius:24px;
+  background:var(--input);
+  display:flex;
+  align-items:center;
+  padding:0 6px;
+}
+
+.input-wrap input{
+  flex:1;
+  min-width:0;
+  border:0;
+  outline:0;
+  background:transparent;
+  color:var(--text);
+  padding:10px 5px;
+}
+
+.round-btn{
+  width:35px;
+  height:35px;
+  border-radius:50%;
+  background:transparent;
+  color:var(--muted);
+  font-size:20px;
+}
+
+.send-btn{
+  width:46px;
+  height:46px;
+  border-radius:50%;
+  background:var(--accent);
+  color:white;
+  font-size:19px;
+}
+
+/* EXTRA MENU */
+
+.extra-menu{
+  position:absolute;
+  bottom:62px;
+  left:8px;
+  background:var(--card);
+  border-radius:14px;
+  box-shadow:var(--shadow);
+  padding:7px;
+  display:none;
+  min-width:190px;
+  border:1px solid var(--border);
+}
+
+.extra-menu.show{
+  display:block;
+}
+
+.extra-menu button{
+  display:flex;
+  gap:10px;
+  width:100%;
+  padding:11px;
+  border-radius:9px;
+  background:transparent;
+  color:var(--text);
+  text-align:left;
+}
+
+.extra-menu button:hover{
+  background:rgba(0,0,0,.06);
+}
+
+/* EMOJI */
+
+.emoji-panel{
+  position:absolute;
+  bottom:62px;
+  left:8px;
+  width:280px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  box-shadow:var(--shadow);
+  padding:12px;
+  display:none;
+}
+
+.emoji-panel.show{
+  display:block;
+}
+
+.emoji-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:6px;
+}
+
+.emoji-grid button{
+  background:transparent;
+  font-size:23px;
+  padding:4px;
+  border-radius:7px;
+}
+
+.emoji-grid button:hover{
+  background:rgba(0,0,0,.08);
+}
+
+/* SETTINGS */
+
+.settings{
+  display:none;
+}
+
+.settings.active{
+  display:block;
+}
+
+.profile-card{
+  background:var(--card);
+  padding:22px;
+  display:flex;
+  align-items:center;
+  gap:15px;
+  border-bottom:1px solid var(--border);
+}
+
+.profile-avatar{
+  width:72px;
+  height:72px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#075e54,#25d366);
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:27px;
+  font-weight:bold;
+}
+
+.profile-name{
+  font-size:20px;
+  font-weight:bold;
+}
+
+.profile-status{
+  color:var(--muted);
+  font-size:13px;
+  margin-top:5px;
+}
+
+.setting-item{
+  display:flex;
+  align-items:center;
+  gap:15px;
+  padding:16px;
+  background:var(--card);
+  border-bottom:1px solid var(--border);
+}
+
+.setting-icon{
+  width:34px;
+  text-align:center;
+  font-size:21px;
+}
+
+.setting-info{
+  flex:1;
+}
+
+.setting-title{
+  font-weight:bold;
+  font-size:14px;
+}
+
+.setting-desc{
+  color:var(--muted);
+  font-size:12px;
+  margin-top:3px;
+}
+
+.toggle{
+  width:47px;
+  height:25px;
+  border-radius:20px;
+  background:#aeb7bd;
+  padding:3px;
+}
+
+.toggle:after{
+  content:"";
+  display:block;
+  width:19px;
+  height:19px;
+  background:white;
+  border-radius:50%;
+  transition:.2s;
+}
+
+.toggle.on{
+  background:var(--accent);
+}
+
+.toggle.on:after{
+  transform:translateX(22px);
+}
+
+.danger{
+  color:var(--danger);
+}
+
+/* MODAL */
+
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.55);
+  z-index:300;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+.modal.show{
+  display:flex;
+}
+
+.modal-box{
+  width:100%;
+  max-width:360px;
+  background:var(--card);
+  color:var(--text);
+  border-radius:16px;
+  padding:20px;
+  box-shadow:var(--shadow);
+}
+
+.modal-box h3{
+  margin-bottom:10px;
+}
+
+.modal-box p{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.5;
+}
+
+.modal-input{
+  width:100%;
+  margin-top:12px;
+  padding:11px;
+  border:1px solid var(--border);
+  border-radius:9px;
+  outline:0;
+  background:var(--input);
+  color:var(--text);
+}
+
+.modal-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:7px;
+  margin-top:18px;
+}
+
+.modal-actions button{
+  padding:9px 14px;
+  border-radius:8px;
+  background:var(--primary2);
+  color:white;
+}
+
+.modal-actions .cancel{
+  background:transparent;
+  color:var(--muted);
+}
+
+/* TOAST */
+
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:84px;
+  transform:translate(-50%,20px);
+  background:#323232;
+  color:white;
+  padding:10px 16px;
+  border-radius:22px;
+  font-size:13px;
+  opacity:0;
+  pointer-events:none;
+  transition:.25s;
+  z-index:500;
+  text-align:center;
+}
+
+.toast.show{
+  opacity:1;
+  transform:translate(-50%,0);
+}
+
+/* EMPTY */
+
+.empty{
+  text-align:center;
+  padding:55px 20px;
+  color:var(--muted);
+}
+
+.empty-icon{
+  font-size:45px;
+  margin-bottom:10px;
+}
+
+@media(min-width:700px){
+  .chat-screen{
+    width:480px;
+    left:50%;
+    transform:translateX(-50%);
+  }
+}
+</style>
 </head>
 
 <body>
 
 <div class="app">
 
-  <!-- ================= HOME ================= -->
+<!-- ================= HOME ================= -->
 
-  <div id="homeScreen">
+<div id="homeScreen">
 
-    <header class="top-header">
+<header class="top-header">
 
-      <div class="header-row">
-        <div class="brand">Alfa Chat</div>
+  <div class="header-row">
 
-        <div class="header-actions">
-          <button class="icon-btn" onclick="focusSearch()" title="Cari">🔍</button>
-          <button class="icon-btn" onclick="showInfo()" title="Info">⋮</button>
-        </div>
-      </div>
+    <div class="brand">Alfa Chat</div>
 
-      <div class="search-box">
-        <span>🔎</span>
-        <input
-          id="searchInput"
-          type="text"
-          placeholder="Cari kontak..."
-          oninput="searchChats()"
-        >
-      </div>
+    <div class="header-actions">
 
-      <div class="tabs">
-        <button class="tab active" onclick="setTab(this,'all')">Semua</button>
-        <button class="tab" onclick="setTab(this,'unread')">Belum Dibaca</button>
-        <button class="tab" onclick="setTab(this,'groups')">Grup</button>
-      </div>
+      <button class="icon-btn" onclick="focusSearch()">🔍</button>
 
-    </header>
-
-    <main class="content">
-
-      <div class="section-title">Percakapan</div>
-
-      <div id="chatList"></div>
-
-    </main>
-
-  </div>
-
-
-  <!-- ================= SETTINGS ================= -->
-
-  <div id="settingsScreen" class="settings">
-
-    <header class="top-header">
-      <div class="header-row">
-        <div class="brand">Pengaturan</div>
-      </div>
-    </header>
-
-    <main class="content">
-
-      <div class="profile-card">
-        <div class="profile-avatar">A</div>
-
-        <div>
-          <div class="profile-name">Alfa</div>
-          <div class="profile-status">Halo! Saya menggunakan Alfa Chat.</div>
-        </div>
-      </div>
-
-      <div class="section-title">Aplikasi</div>
-
-      <div class="setting-item" onclick="toggleDarkMode()">
-        <div class="setting-icon">🌙</div>
-
-        <div class="setting-info">
-          <div class="setting-title">Mode Gelap</div>
-          <div class="setting-desc">Gunakan tampilan gelap</div>
-        </div>
-
-        <div id="darkToggle" class="toggle"></div>
-      </div>
-
-      <div class="setting-item" onclick="showToast('Notifikasi simulasi aktif 🔔')">
-        <div class="setting-icon">🔔</div>
-
-        <div class="setting-info">
-          <div class="setting-title">Notifikasi</div>
-          <div class="setting-desc">Kelola notifikasi Alfa Chat</div>
-        </div>
-      </div>
-
-      <div class="setting-item" onclick="showToast('Fitur keamanan simulasi')">
-        <div class="setting-icon">🔐</div>
-
-        <div class="setting-info">
-          <div class="setting-title">Privasi & Keamanan</div>
-          <div class="setting-desc">Pengaturan privasi aplikasi</div>
-        </div>
-      </div>
-
-      <div class="section-title">Data</div>
-
-      <div class="setting-item" onclick="confirmClear()">
-        <div class="setting-icon danger">🗑️</div>
-
-        <div class="setting-info">
-          <div class="setting-title danger">Hapus Semua Pesan</div>
-          <div class="setting-desc">Menghapus data chat dari browser</div>
-        </div>
-      </div>
-
-      <div class="section-title">Tentang</div>
-
-      <div class="setting-item" onclick="showAbout()">
-        <div class="setting-icon">ℹ️</div>
-
-        <div class="setting-info">
-          <div class="setting-title">Tentang Alfa Chat</div>
-          <div class="setting-desc">Versi 3.0 • Simulasi Web App</div>
-        </div>
-      </div>
-
-    </main>
-
-  </div>
-
-
-  <!-- ================= CHAT SCREEN ================= -->
-
-  <div id="chatScreen" class="chat-screen">
-
-    <header class="chat-header">
-
-      <button class="back-btn" onclick="closeChat()">‹</button>
-
-      <div id="chatAvatar" class="chat-header-avatar">B</div>
-
-      <div class="chat-header-info">
-        <div id="chatName" class="chat-header-name">Budi</div>
-        <div id="chatStatus" class="chat-status">online</div>
-      </div>
-
-      <div class="chat-header-actions">
-        <button onclick="showToast('Panggilan suara adalah simulasi 📞')">📞</button>
-        <button onclick="showToast('Menu chat simulasi ⋮')">⋮</button>
-      </div>
-
-    </header>
-
-    <div id="messages" class="messages"></div>
-
-    <div id="typing" class="typing">
-      sedang mengetik...
-    </div>
-
-    <div class="chat-input-area">
-
-      <div class="input-wrap">
-
-        <button onclick="addEmoji()">😊</button>
-
-        <input
-          id="messageInput"
-          type="text"
-          placeholder="Ketik pesan"
-          autocomplete="off"
-        >
-
-        <button onclick="showToast('Lampiran adalah simulasi 📎')">📎</button>
-
-      </div>
-
-      <button class="send-btn" onclick="sendMessage()">➤</button>
+      <button class="icon-btn" onclick="showInfo()">⋮</button>
 
     </div>
 
   </div>
 
+  <div class="search-box">
 
-  <!-- ================= BOTTOM NAV ================= -->
+    🔎
 
-  <nav class="bottom-nav">
+    <input
+      id="searchInput"
+      type="text"
+      placeholder="Cari kontak atau pesan..."
+      oninput="searchAll()"
+    >
 
-    <button id="navChat" class="nav-btn active" onclick="showHome()">
-      <span>💬</span>
-      Chat
+  </div>
+
+  <div class="tabs">
+
+    <button class="tab active" onclick="setTab(this,'all')">
+      Semua
     </button>
 
-    <button class="nav-btn" onclick="showContacts()">
-      <span>👥</span>
-      Kontak
+    <button class="tab" onclick="setTab(this,'unread')">
+      Belum Dibaca
     </button>
 
-    <button id="navSettings" class="nav-btn" onclick="showSettings()">
-      <span>⚙️</span>
+    <button class="tab" onclick="setTab(this,'groups')">
+      Grup
+    </button>
+
+  </div>
+
+</header>
+
+<main class="content">
+
+  <div class="section-title">
+    Percakapan
+  </div>
+
+  <div id="chatList"></div>
+
+</main>
+
+</div>
+
+
+<!-- ================= SETTINGS ================= -->
+
+<div id="settingsScreen" class="settings">
+
+<header class="top-header">
+
+  <div class="header-row">
+
+    <div class="brand">
       Pengaturan
+    </div>
+
+  </div>
+
+</header>
+
+<main class="content">
+
+<div class="profile-card">
+
+  <div class="profile-avatar" id="profileAvatar">
+    A
+  </div>
+
+  <div>
+
+    <div class="profile-name" id="profileName">
+      Alfa
+    </div>
+
+    <div class="profile-status" id="profileStatus">
+      Halo! Saya menggunakan Alfa Chat.
+    </div>
+
+  </div>
+
+</div>
+
+<div
+  class="setting-item"
+  onclick="editProfile()"
+>
+
+  <div class="setting-icon">
+    ✏️
+  </div>
+
+  <div class="setting-info">
+
+    <div class="setting-title">
+      Edit Profil
+    </div>
+
+    <div class="setting-desc">
+      Ubah nama dan status
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section-title">
+  Aplikasi
+</div>
+
+<div
+  class="setting-item"
+  onclick="toggleDarkMode()"
+>
+
+  <div class="setting-icon">
+    🌙
+  </div>
+
+  <div class="setting-info">
+
+    <div class="setting-title">
+      Mode Gelap
+    </div>
+
+    <div class="setting-desc">
+      Gunakan tampilan gelap
+    </div>
+
+  </div>
+
+  <div id="darkToggle" class="toggle"></div>
+
+</div>
+
+<div
+  class="setting-item"
+  onclick="showToast('Notifikasi simulasi aktif 🔔')"
+>
+
+  <div class="setting-icon">
+    🔔
+  </div>
+
+  <div class="setting-info">
+
+    <div class="setting-title">
+      Notifikasi
+    </div>
+
+    <div class="setting-desc">
+      Kelola notifikasi Alfa Chat
+    </div>
+
+  </div>
+
+</div>
+
+<div
+  class="setting-item"
+  onclick="showToast('Privasi aman untuk simulasi lokal 🔐')"
+>
+
+  <div class="setting-icon">
+    🔐
+  </div>
+
+  <div class="setting-info">
+
+    <div class="setting-title">
+      Privasi & Keamanan
+    </div>
+
+    <div class="setting-desc">
+      Data chat tersimpan di browser
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section-title">
+  Data
+</div>
+
+<div
+  class="setting-item"
+  onclick="confirmClearAll()"
+>
+
+  <div class="setting-icon danger">
+    🗑️
+  </div>
+
+  <div class="setting-info">
+
+    <div class="setting-title danger">
+      Hapus Semua Data
+    </div>
+
+    <div class="setting-desc">
+      Menghapus chat dan data lokal
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section-title">
+  Tentang
+</div>
+
+<div
+  class="setting-item"
+  onclick="showAbout()"
+>
+
+  <div class="setting-icon">
+    ℹ️
+  </div>
+
+  <div class="setting-info">
+
+    <div class="setting-title">
+      Tentang Alfa Chat
+    </div>
+
+    <div class="setting-desc">
+      Alfa Chat V4 • Alfa Design
+    </div>
+
+  </div>
+
+</div>
+
+</main>
+
+</div>
+
+
+<!-- ================= CHAT ================= -->
+
+<div id="chatScreen" class="chat-screen">
+
+<header class="chat-header">
+
+  <button class="back-btn" onclick="closeChat()">
+    ‹
+  </button>
+
+  <div id="chatAvatar" class="chat-header-avatar">
+    B
+  </div>
+
+  <div class="chat-header-info">
+
+    <div id="chatName" class="chat-header-name">
+      Budi
+    </div>
+
+    <div id="chatStatus" class="chat-status">
+      online
+    </div>
+
+  </div>
+
+  <div class="chat-header-actions">
+
+    <button onclick="showToast('Panggilan suara simulasi 📞')">
+      📞
     </button>
 
-  </nav>
+    <button onclick="showToast('Video call simulasi 📹')">
+      📹
+    </button>
+
+    <button onclick="showToast('Menu chat simulasi ⋮')">
+      ⋮
+    </button>
+
+  </div>
+
+</header>
+
+<div id="messages" class="messages"></div>
+
+<div id="typing" class="typing">
+  sedang mengetik...
+</div>
+
+<div class="chat-input-area">
+
+  <div id="emojiPanel" class="emoji-panel">
+
+    <div class="emoji-grid">
+
+      <button onclick="insertEmoji('😀')">😀</button>
+      <button onclick="insertEmoji('😂')">😂</button>
+      <button onclick="insertEmoji('😍')">😍</button>
+      <button onclick="insertEmoji('🥰')">🥰</button>
+      <button onclick="insertEmoji('😎')">😎</button>
+      <button onclick="insertEmoji('😭')">😭</button>
+      <button onclick="insertEmoji('😡')">😡</button>
+
+      <button onclick="insertEmoji('👍')">👍</button>
+      <button onclick="insertEmoji('👎')">👎</button>
+      <button onclick="insertEmoji('👏')">👏</button>
+      <button onclick="insertEmoji('🙏')">🙏</button>
+      <button onclick="insertEmoji('🔥')">🔥</button>
+      <button onclick="insertEmoji('❤️')">❤️</button>
+      <button onclick="insertEmoji('💯')">💯</button>
+
+      <button onclick="insertEmoji('🚀')">🚀</button>
+      <button onclick="insertEmoji('🎉')">🎉</button>
+      <button onclick="insertEmoji('✨')">✨</button>
+      <button onclick="insertEmoji('💻')">💻</button>
+      <button onclick="insertEmoji('📱')">📱</button>
+      <button onclick="insertEmoji('☕')">☕</button>
+      <button onclick="insertEmoji('😴')">😴</button>
+
+    </div>
+
+  </div>
+
+
+  <div id="extraMenu" class="extra-menu">
+
+    <button onclick="fakeAttachment('📷 Kamera')">
+      📷 Kamera
+    </button>
+
+    <button onclick="fakeAttachment('🖼️ Galeri')">
+      🖼️ Galeri
+    </button>
+
+    <button onclick="fakeAttachment('📄 Dokumen')">
+      📄 Dokumen
+    </button>
+
+    <button onclick="fakeAttachment('📍 Lokasi')">
+      📍 Lokasi
+    </button>
+
+  </div>
+
+
+  <div class="input-wrap">
+
+    <button
+      class="round-btn"
+      onclick="toggleEmoji()"
+    >
+      😊
+    </button>
+
+    <input
+      id="messageInput"
+      type="text"
+      placeholder="Ketik pesan"
+      autocomplete="off"
+    >
+
+    <button
+      class="round-btn"
+      onclick="toggleExtra()"
+    >
+      📎
+    </button>
+
+  </div>
+
+  <button
+    class="send-btn"
+    onclick="sendMessage()"
+  >
+    ➤
+  </button>
+
+</div>
+
+</div>
+
+
+<!-- ================= NAV ================= -->
+
+<nav class="bottom-nav">
+
+<button
+  id="navChat"
+  class="nav-btn active"
+  onclick="showHome()"
+>
+  <span>💬</span>
+  Chat
+</button>
+
+<button
+  class="nav-btn"
+  onclick="showContacts()"
+>
+  <span>👥</span>
+  Kontak
+</button>
+
+<button
+  id="navSettings"
+  class="nav-btn"
+  onclick="showSettings()"
+>
+  <span>⚙️</span>
+  Pengaturan
+</button>
+
+</nav>
 
 </div>
 
@@ -967,23 +1285,40 @@
 
 <div id="modal" class="modal">
 
-  <div class="modal-box">
+<div class="modal-box">
 
-    <h3 id="modalTitle">Informasi</h3>
+  <h3 id="modalTitle">
+    Informasi
+  </h3>
 
-    <p id="modalText"></p>
+  <p id="modalText"></p>
 
-    <div class="modal-actions">
+  <input
+    id="modalInput"
+    class="modal-input"
+    style="display:none"
+  >
 
-      <button class="cancel" onclick="closeModal()">Tutup</button>
+  <div class="modal-actions">
 
-      <button id="modalConfirm" style="display:none;" onclick="confirmAction()">
-        Hapus
-      </button>
+    <button
+      class="cancel"
+      onclick="closeModal()"
+    >
+      Tutup
+    </button>
 
-    </div>
+    <button
+      id="modalConfirm"
+      style="display:none"
+      onclick="runModalAction()"
+    >
+      Simpan
+    </button>
 
   </div>
+
+</div>
 
 </div>
 
@@ -993,378 +1328,310 @@
 
 <script>
 
-  /* =====================================================
-     ALFA CHAT V3
-     ===================================================== */
+/* =====================================================
+   ALFA CHAT V4
+   ===================================================== */
 
-  const STORAGE_KEY = "alfaChatV3Messages";
-  const DARK_KEY = "alfaChatV3Dark";
+const STORAGE_KEY = "alfaChatV4";
+const PROFILE_KEY = "alfaChatProfile";
+const DARK_KEY = "alfaChatDarkV4";
 
-  const defaultChats = {
-    budi: {
-      id: "budi",
-      name: "Budi",
-      avatar: "B",
-      status: "online",
-      group: false,
-      unread: 0,
-      messages: [
-        {
-          id: 1,
-          from: "other",
-          text: "Halo Alfa 👋",
-          time: "09:10",
-          read: true
-        },
-        {
-          id: 2,
-          from: "me",
-          text: "Halo Budi! Apa kabar?",
-          time: "09:11",
-          read: true
-        },
-        {
-          id: 3,
-          from: "other",
-          text: "Baik bos 😎 Lagi belajar Alfa Chat?",
-          time: "09:12",
-          read: true
-        }
-      ]
-    },
+const defaultChats = {
 
-    andi: {
-      id: "andi",
-      name: "Andi",
-      avatar: "A",
-      status: "terakhir dilihat baru saja",
-      group: false,
-      unread: 2,
-      messages: [
-        {
-          id: 4,
-          from: "other",
-          text: "Bro, nanti lanjut coding ya.",
-          time: "08:45",
-          read: false
-        },
-        {
-          id: 5,
-          from: "other",
-          text: "Jangan lupa cek Alfa Chat 🔥",
-          time: "08:46",
-          read: false
-        }
-      ]
-    },
+  budi:{
+    id:"budi",
+    name:"Budi",
+    avatar:"B",
+    status:"online",
+    group:false,
+    pinned:true,
+    unread:0,
 
-    siti: {
-      id: "siti",
-      name: "Siti",
-      avatar: "S",
-      status: "online",
-      group: false,
-      unread: 0,
-      messages: [
-        {
-          id: 6,
-          from: "other",
-          text: "Website-nya bagus 👍",
-          time: "Kemarin",
-          read: true
-        }
-      ]
-    },
+    messages:[
+      {
+        id:1,
+        from:"other",
+        text:"Halo Alfa 👋",
+        time:"09:10",
+        favorite:false
+      },
+      {
+        id:2,
+        from:"me",
+        text:"Halo Budi! Apa kabar?",
+        time:"09:11",
+        read:true,
+        favorite:true
+      },
+      {
+        id:3,
+        from:"other",
+        text:"Baik bos 😎 Lagi belajar Alfa Chat?",
+        time:"09:12",
+        favorite:false
+      }
+    ]
+  },
 
-    alfagroup: {
-      id: "alfagroup",
-      name: "Alfa Design Team",
-      avatar: "AD",
-      status: "4 anggota",
-      group: true,
-      unread: 0,
-      messages: [
-        {
-          id: 7,
-          from: "other",
-          text: "Selamat datang di grup Alfa Design 🚀",
-          time: "Kemarin",
-          read: true
-        },
-        {
-          id: 8,
-          from: "me",
-          text: "Siap, kita gas proyeknya! 🔥",
-          time: "Kemarin",
-          read: true
-        }
-      ]
+  andi:{
+    id:"andi",
+    name:"Andi",
+    avatar:"A",
+    status:"terakhir dilihat baru saja",
+    group:false,
+    pinned:false,
+    unread:2,
+
+    messages:[
+      {
+        id:4,
+        from:"other",
+        text:"Bro, nanti lanjut coding ya.",
+        time:"08:45",
+        favorite:false
+      },
+      {
+        id:5,
+        from:"other",
+        text:"Jangan lupa cek Alfa Chat 🔥",
+        time:"08:46",
+        favorite:false
+      }
+    ]
+  },
+
+  siti:{
+    id:"siti",
+    name:"Siti",
+    avatar:"S",
+    status:"online",
+    group:false,
+    pinned:false,
+    unread:0,
+
+    messages:[
+      {
+        id:6,
+        from:"other",
+        text:"Website-nya bagus 👍",
+        time:"Kemarin",
+        favorite:false
+      }
+    ]
+  },
+
+  alfagroup:{
+    id:"alfagroup",
+    name:"Alfa Design Team",
+    avatar:"AD",
+    status:"4 anggota",
+    group:true,
+    pinned:false,
+    unread:0,
+
+    messages:[
+      {
+        id:7,
+        from:"other",
+        text:"Selamat datang di grup Alfa Design 🚀",
+        time:"Kemarin",
+        favorite:false
+      },
+      {
+        id:8,
+        from:"me",
+        text:"Siap, kita gas proyeknya! 🔥",
+        time:"Kemarin",
+        favorite:false
+      }
+    ]
+  }
+
+};
+
+
+let chats = loadChats();
+
+let activeChat = null;
+
+let modalAction = null;
+
+
+/* ================= STORAGE ================= */
+
+function loadChats(){
+
+  const saved =
+    localStorage.getItem(STORAGE_KEY);
+
+  if(saved){
+
+    try{
+      return JSON.parse(saved);
     }
+    catch(e){
+      console.log("Data tidak valid.");
+    }
+
+  }
+
+  return JSON.parse(
+    JSON.stringify(defaultChats)
+  );
+
+}
+
+
+function saveChats(){
+
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(chats)
+  );
+
+}
+
+
+/* ================= PROFILE ================= */
+
+function loadProfile(){
+
+  const saved =
+    localStorage.getItem(PROFILE_KEY);
+
+  if(saved){
+
+    try{
+      return JSON.parse(saved);
+    }
+    catch(e){}
+
+  }
+
+  return {
+    name:"Alfa",
+    status:"Halo! Saya menggunakan Alfa Chat."
   };
 
-
-  let chats = loadChats();
-  let activeChat = null;
-  let modalAction = null;
+}
 
 
-  /* ================= STORAGE ================= */
+let profile = loadProfile();
 
-  function loadChats() {
 
-    const saved = localStorage.getItem(STORAGE_KEY);
+function saveProfile(){
 
-    if (saved) {
+  localStorage.setItem(
+    PROFILE_KEY,
+    JSON.stringify(profile)
+  );
 
-      try {
-        return JSON.parse(saved);
+}
 
-      } catch (error) {
-        console.log("Data lama rusak, memakai data default.");
-      }
 
+function updateProfileUI(){
+
+  document.getElementById("profileName")
+    .textContent = profile.name;
+
+  document.getElementById("profileStatus")
+    .textContent = profile.status;
+
+  document.getElementById("profileAvatar")
+    .textContent =
+      profile.name.charAt(0).toUpperCase();
+
+}
+
+
+/* ================= TIME ================= */
+
+function currentTime(){
+
+  return new Date().toLocaleTimeString(
+    "id-ID",
+    {
+      hour:"2-digit",
+      minute:"2-digit"
     }
+  );
 
-    return JSON.parse(JSON.stringify(defaultChats));
-  }
-
-
-  function saveChats() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(chats));
-  }
+}
 
 
-  /* ================= TIME ================= */
+/* ================= CHAT LIST ================= */
 
-  function currentTime() {
+function renderChatList(filter=""){
 
-    const now = new Date();
+  const list =
+    document.getElementById("chatList");
 
-    return now.toLocaleTimeString("id-ID", {
-      hour: "2-digit",
-      minute: "2-digit"
-    });
+  const search =
+    filter.toLowerCase().trim();
 
-  }
+  list.innerHTML="";
 
+  const chatArray =
+    Object.values(chats)
+    .sort((a,b)=>{
 
-  /* ================= CHAT LIST ================= */
+      if(a.pinned && !b.pinned) return -1;
 
-  function renderChatList(filter = "") {
+      if(!a.pinned && b.pinned) return 1;
 
-    const list = document.getElementById("chatList");
-
-    const search = filter.toLowerCase().trim();
-
-    list.innerHTML = "";
-
-    let found = 0;
-
-    Object.values(chats).forEach(chat => {
-
-      if (
-        search &&
-        !chat.name.toLowerCase().includes(search)
-      ) {
-        return;
-      }
-
-      found++;
-
-      const messages = chat.messages || [];
-
-      const last = messages[messages.length - 1];
-
-      const preview = last
-        ? `${last.from === "me" ? "Anda: " : ""}${last.text}`
-        : "Belum ada pesan";
-
-      const item = document.createElement("div");
-
-      item.className = "chat-item";
-
-      item.dataset.name = chat.name.toLowerCase();
-
-      item.onclick = () => openChat(chat.id);
-
-      item.innerHTML = `
-        <div class="avatar">
-          ${escapeHTML(chat.avatar)}
-          ${
-            chat.status === "online"
-              ? `<span class="online-dot"></span>`
-              : ""
-          }
-        </div>
-
-        <div class="chat-info">
-
-          <div class="chat-top">
-
-            <div class="chat-name">
-              ${escapeHTML(chat.name)}
-            </div>
-
-            <div class="chat-time">
-              ${last ? escapeHTML(last.time) : ""}
-            </div>
-
-          </div>
-
-          <div class="chat-preview">
-            ${escapeHTML(preview)}
-          </div>
-
-        </div>
-
-        ${
-          chat.unread > 0
-          ? `<div class="unread">${chat.unread}</div>`
-          : ""
-        }
-
-      `;
-
-      list.appendChild(item);
+      return 0;
 
     });
 
+  let found=0;
 
-    if (!found) {
+  chatArray.forEach(chat=>{
 
-      list.innerHTML = `
-        <div class="empty">
+    const hasContact =
+      chat.name
+      .toLowerCase()
+      .includes(search);
 
-          <div class="empty-icon">🔍</div>
+    const hasMessage =
+      chat.messages.some(
+        m =>
+          m.text
+          .toLowerCase()
+          .includes(search)
+      );
 
-          <div>
-            Kontak tidak ditemukan
-          </div>
-
-        </div>
-      `;
-
-    }
-
-  }
-
-
-  /* ================= SEARCH ================= */
-
-  function searchChats() {
-
-    const input = document.getElementById("searchInput");
-
-    renderChatList(input.value);
-
-  }
-
-
-  function focusSearch() {
-
-    document.getElementById("searchInput").focus();
-
-  }
-
-
-  /* ================= TABS ================= */
-
-  function setTab(button, type) {
-
-    document.querySelectorAll(".tab")
-      .forEach(tab => tab.classList.remove("active"));
-
-    button.classList.add("active");
-
-    const list = document.getElementById("chatList");
-
-    list.innerHTML = "";
-
-    if (type === "unread") {
-
-      Object.values(chats).forEach(chat => {
-
-        if (chat.unread > 0) {
-
-          renderSingleChat(chat);
-
-        }
-
-      });
-
-      if (!list.children.length) {
-
-        list.innerHTML = `
-          <div class="empty">
-            <div class="empty-icon">✅</div>
-            Tidak ada pesan belum dibaca
-          </div>
-        `;
-
-      }
-
+    if(search && !hasContact && !hasMessage){
       return;
     }
 
+    found++;
 
-    if (type === "groups") {
+    const last =
+      chat.messages[
+        chat.messages.length-1
+      ];
 
-      Object.values(chats).forEach(chat => {
-
-        if (chat.group) {
-
-          renderSingleChat(chat);
-
-        }
-
-      });
-
-      if (!list.children.length) {
-
-        list.innerHTML = `
-          <div class="empty">
-            <div class="empty-icon">👥</div>
-            Belum ada grup
-          </div>
-        `;
-
-      }
-
-      return;
-    }
-
-
-    renderChatList();
-
-  }
-
-
-  function renderSingleChat(chat) {
-
-    const list = document.getElementById("chatList");
-
-    const messages = chat.messages || [];
-
-    const last = messages[messages.length - 1];
-
-    const preview = last
-      ? `${last.from === "me" ? "Anda: " : ""}${last.text}`
+    const preview =
+      last
+      ? `${last.from==="me" ? "Anda: " : ""}${last.text}`
       : "Belum ada pesan";
 
-    const item = document.createElement("div");
+    const item =
+      document.createElement("div");
 
-    item.className = "chat-item";
+    item.className="chat-item";
 
-    item.onclick = () => openChat(chat.id);
+    item.onclick =
+      ()=>openChat(chat.id);
 
-    item.innerHTML = `
+    item.innerHTML=`
 
       <div class="avatar">
 
         ${escapeHTML(chat.avatar)}
 
         ${
-          chat.status === "online"
+          chat.status==="online"
           ? `<span class="online-dot"></span>`
           : ""
         }
@@ -1391,581 +1658,1009 @@
 
       </div>
 
-      ${
-        chat.unread > 0
-        ? `<div class="unread">${chat.unread}</div>`
-        : ""
-      }
+      <div class="chat-right">
+
+        ${
+          chat.pinned
+          ? `<div class="pin">📌</div>`
+          : ""
+        }
+
+        ${
+          chat.unread>0
+          ? `<div class="unread">${chat.unread}</div>`
+          : ""
+        }
+
+      </div>
 
     `;
 
     list.appendChild(item);
 
-  }
-
-
-  /* ================= OPEN CHAT ================= */
-
-  function openChat(id) {
-
-    activeChat = id;
-
-    const chat = chats[id];
-
-    if (!chat) return;
-
-    document.getElementById("chatName").textContent = chat.name;
-
-    document.getElementById("chatAvatar").textContent = chat.avatar;
-
-    document.getElementById("chatStatus").textContent = chat.status;
-
-    chat.unread = 0;
-
-    saveChats();
-
-    renderMessages();
-
-    document.getElementById("chatScreen")
-      .classList.add("active");
-
-    setTimeout(() => {
-
-      document.getElementById("messageInput").focus();
-
-    }, 150);
-
-  }
-
-
-  function closeChat() {
-
-    document.getElementById("chatScreen")
-      .classList.remove("active");
-
-    activeChat = null;
-
-    renderChatList();
-
-  }
-
-
-  /* ================= RENDER MESSAGES ================= */
-
-  function renderMessages() {
-
-    const container = document.getElementById("messages");
-
-    const chat = chats[activeChat];
-
-    if (!chat) return;
-
-    container.innerHTML = `
-      <div class="date-label">Hari ini</div>
-    `;
-
-    chat.messages.forEach(message => {
-
-      const row = document.createElement("div");
-
-      row.className =
-        `message-row ${message.from === "me" ? "me" : "other"}`;
-
-      const bubble = document.createElement("div");
-
-      bubble.className = "message";
-
-      bubble.innerHTML = `
-
-        <div class="message-text">
-          ${escapeHTML(message.text)}
-        </div>
-
-        <div class="message-meta">
-
-          ${escapeHTML(message.time)}
-
-          ${
-            message.from === "me"
-            ? `<span class="ticks">✓✓</span>`
-            : ""
-          }
-
-        </div>
-
-        ${
-          message.from === "me"
-          ? `
-            <div class="message-menu" id="menu-${message.id}">
-
-              <button onclick="deleteMessage(${message.id})">
-                🗑️ Hapus pesan
-              </button>
-
-            </div>
-          `
-          : ""
-        }
-
-      `;
-
-      if (message.from === "me") {
-
-        bubble.onclick = function(event) {
-
-          event.stopPropagation();
-
-          closeAllMessageMenus();
-
-          const menu = document.getElementById(
-            `menu-${message.id}`
-          );
-
-          if (menu) {
-            menu.classList.toggle("show");
-          }
-
-        };
-
-      }
-
-      row.appendChild(bubble);
-
-      container.appendChild(row);
-
-    });
-
-    container.scrollTop = container.scrollHeight;
-
-  }
-
-
-  /* ================= SEND ================= */
-
-  function sendMessage() {
-
-    if (!activeChat) return;
-
-    const input = document.getElementById("messageInput");
-
-    const text = input.value.trim();
-
-    if (!text) return;
-
-    const message = {
-
-      id: Date.now(),
-
-      from: "me",
-
-      text: text,
-
-      time: currentTime(),
-
-      read: true
-
-    };
-
-    chats[activeChat].messages.push(message);
-
-    saveChats();
-
-    input.value = "";
-
-    renderMessages();
-
-    renderChatList();
-
-    simulateReply(text);
-
-  }
-
-
-  /* ================= SIMULATED REPLY ================= */
-
-  function simulateReply(userText) {
-
-    const chatId = activeChat;
-
-    const chat = chats[chatId];
-
-    if (!chat) return;
-
-    const typing = document.getElementById("typing");
-
-    typing.classList.add("show");
-
-    chat.status = "sedang mengetik...";
-
-    document.getElementById("chatStatus").textContent =
-      "sedang mengetik...";
-
-
-    const replies = [
-
-      "Oke 👍",
-
-      "Siap bosss 🔥",
-
-      "Mantap 😎",
-
-      "Wah keren!",
-
-      "Lanjut gas 🚀",
-
-      "Siap, saya cek dulu.",
-
-      "Bagus banget 👍",
-
-      "Hehe siap bos 😂"
-
-    ];
-
-    setTimeout(() => {
-
-      if (!chats[chatId]) return;
-
-      const reply =
-        replies[Math.floor(Math.random() * replies.length)];
-
-      chats[chatId].messages.push({
-
-        id: Date.now(),
-
-        from: "other",
-
-        text: reply,
-
-        time: currentTime(),
-
-        read: true
-
-      });
-
-      chats[chatId].status = "online";
-
-      typing.classList.remove("show");
-
-      if (activeChat === chatId) {
-
-        document.getElementById("chatStatus").textContent =
-          chats[chatId].status;
-
-        renderMessages();
-
-      }
-
-      saveChats();
-
-      renderChatList();
-
-    }, 1000 + Math.random() * 1800);
-
-  }
-
-
-  /* ================= ENTER SEND ================= */
-
-  document.getElementById("messageInput")
-    .addEventListener("keydown", function(event) {
-
-      if (event.key === "Enter") {
-
-        event.preventDefault();
-
-        sendMessage();
-
-      }
-
-    });
-
-
-  /* ================= DELETE MESSAGE ================= */
-
-  function deleteMessage(id) {
-
-    if (!activeChat) return;
-
-    chats[activeChat].messages =
-      chats[activeChat].messages.filter(
-        message => message.id !== id
-      );
-
-    saveChats();
-
-    renderMessages();
-
-    renderChatList();
-
-    showToast("Pesan dihapus 🗑️");
-
-  }
-
-
-  function closeAllMessageMenus() {
-
-    document.querySelectorAll(".message-menu")
-      .forEach(menu => menu.classList.remove("show"));
-
-  }
-
-
-  document.addEventListener("click", function() {
-
-    closeAllMessageMenus();
-
   });
 
 
-  /* ================= EMOJI ================= */
+  if(!found){
 
-  function addEmoji() {
+    list.innerHTML=`
 
-    const input = document.getElementById("messageInput");
+      <div class="empty">
 
-    input.value += " 😊";
+        <div class="empty-icon">
+          🔍
+        </div>
 
-    input.focus();
+        Kontak atau pesan tidak ditemukan.
 
-  }
+      </div>
 
-
-  /* ================= NAVIGATION ================= */
-
-  function showHome() {
-
-    document.getElementById("homeScreen").style.display = "block";
-
-    document.getElementById("settingsScreen")
-      .classList.remove("active");
-
-    document.getElementById("navChat")
-      .classList.add("active");
-
-    document.getElementById("navSettings")
-      .classList.remove("active");
-
-    renderChatList();
+    `;
 
   }
 
-
-  function showSettings() {
-
-    document.getElementById("homeScreen").style.display = "none";
-
-    document.getElementById("settingsScreen")
-      .classList.add("active");
-
-    document.getElementById("navChat")
-      .classList.remove("active");
-
-    document.getElementById("navSettings")
-      .classList.add("active");
-
-    updateDarkToggle();
-
-  }
+}
 
 
-  function showContacts() {
+/* ================= SEARCH ================= */
 
-    showToast("Kontak masih dalam mode simulasi 👥");
+function searchAll(){
 
-  }
+  const value =
+    document.getElementById("searchInput").value;
 
+  renderChatList(value);
 
-  /* ================= DARK MODE ================= */
-
-  function toggleDarkMode() {
-
-    document.body.classList.toggle("dark");
-
-    const enabled =
-      document.body.classList.contains("dark");
-
-    localStorage.setItem(DARK_KEY, enabled ? "1" : "0");
-
-    updateDarkToggle();
-
-  }
+}
 
 
-  function updateDarkToggle() {
+function focusSearch(){
 
-    const toggle =
-      document.getElementById("darkToggle");
+  document.getElementById("searchInput").focus();
 
-    if (!toggle) return;
-
-    const enabled =
-      document.body.classList.contains("dark");
-
-    toggle.classList.toggle("on", enabled);
-
-  }
+}
 
 
-  function loadDarkMode() {
+/* ================= TABS ================= */
 
-    const enabled =
-      localStorage.getItem(DARK_KEY) === "1";
+function setTab(button,type){
 
-    document.body.classList.toggle("dark", enabled);
-
-    updateDarkToggle();
-
-  }
-
-
-  /* ================= CLEAR DATA ================= */
-
-  function confirmClear() {
-
-    openModal(
-      "Hapus Semua Pesan?",
-      "Semua pesan simulasi yang tersimpan di browser akan dihapus.",
-      true,
-      clearAllMessages
+  document.querySelectorAll(".tab")
+    .forEach(
+      tab=>tab.classList.remove("active")
     );
 
+  button.classList.add("active");
+
+  const list =
+    document.getElementById("chatList");
+
+  list.innerHTML="";
+
+  if(type==="unread"){
+
+    Object.values(chats).forEach(chat=>{
+
+      if(chat.unread>0){
+        renderSingleChat(chat);
+      }
+
+    });
+
+    if(!list.children.length){
+
+      list.innerHTML=`
+        <div class="empty">
+          <div class="empty-icon">✅</div>
+          Tidak ada pesan belum dibaca.
+        </div>
+      `;
+
+    }
+
+    return;
   }
 
 
-  function clearAllMessages() {
+  if(type==="groups"){
 
-    localStorage.removeItem(STORAGE_KEY);
+    Object.values(chats).forEach(chat=>{
 
-    chats =
-      JSON.parse(JSON.stringify(defaultChats));
+      if(chat.group){
+        renderSingleChat(chat);
+      }
+
+    });
+
+    if(!list.children.length){
+
+      list.innerHTML=`
+        <div class="empty">
+          <div class="empty-icon">👥</div>
+          Belum ada grup.
+        </div>
+      `;
+
+    }
+
+    return;
+  }
+
+
+  renderChatList();
+
+}
+
+
+function renderSingleChat(chat){
+
+  const list =
+    document.getElementById("chatList");
+
+  const last =
+    chat.messages[
+      chat.messages.length-1
+    ];
+
+  const preview =
+    last
+    ? `${last.from==="me"?"Anda: ":""}${last.text}`
+    : "Belum ada pesan";
+
+  const item =
+    document.createElement("div");
+
+  item.className="chat-item";
+
+  item.onclick =
+    ()=>openChat(chat.id);
+
+  item.innerHTML=`
+
+    <div class="avatar">
+
+      ${escapeHTML(chat.avatar)}
+
+      ${
+        chat.status==="online"
+        ? `<span class="online-dot"></span>`
+        : ""
+      }
+
+    </div>
+
+    <div class="chat-info">
+
+      <div class="chat-top">
+
+        <div class="chat-name">
+          ${escapeHTML(chat.name)}
+        </div>
+
+        <div class="chat-time">
+          ${last ? escapeHTML(last.time) : ""}
+        </div>
+
+      </div>
+
+      <div class="chat-preview">
+        ${escapeHTML(preview)}
+      </div>
+
+    </div>
+
+    <div class="chat-right">
+
+      ${
+        chat.pinned
+        ? `<div class="pin">📌</div>`
+        : ""
+      }
+
+      ${
+        chat.unread>0
+        ? `<div class="unread">${chat.unread}</div>`
+        : ""
+      }
+
+    </div>
+
+  `;
+
+  list.appendChild(item);
+
+}
+
+
+/* ================= OPEN CHAT ================= */
+
+function openChat(id){
+
+  activeChat=id;
+
+  const chat=chats[id];
+
+  if(!chat)return;
+
+  document.getElementById("chatName")
+    .textContent=chat.name;
+
+  document.getElementById("chatAvatar")
+    .textContent=chat.avatar;
+
+  document.getElementById("chatStatus")
+    .textContent=chat.status;
+
+  chat.unread=0;
+
+  saveChats();
+
+  renderMessages();
+
+  document.getElementById("chatScreen")
+    .classList.add("active");
+
+  closePanels();
+
+  setTimeout(
+    ()=>document.getElementById("messageInput").focus(),
+    100
+  );
+
+}
+
+
+/* ================= CLOSE ================= */
+
+function closeChat(){
+
+  document.getElementById("chatScreen")
+    .classList.remove("active");
+
+  activeChat=null;
+
+  renderChatList();
+
+}
+
+
+/* ================= MESSAGES ================= */
+
+function renderMessages(){
+
+  const container =
+    document.getElementById("messages");
+
+  const chat=chats[activeChat];
+
+  if(!chat)return;
+
+  container.innerHTML=`
+    <div class="date-label">
+      Hari ini
+    </div>
+  `;
+
+  chat.messages.forEach(message=>{
+
+    const row =
+      document.createElement("div");
+
+    row.className=
+      `message-row ${
+        message.from==="me"
+        ? "me"
+        : "other"
+      }`;
+
+    const bubble =
+      document.createElement("div");
+
+    bubble.className=
+      `message ${
+        message.favorite
+        ? "favorite"
+        : ""
+      }`;
+
+    bubble.innerHTML=`
+
+      <div class="message-text">
+        ${escapeHTML(message.text)}
+      </div>
+
+      <div class="message-meta">
+
+        ${
+          message.favorite
+          ? `<span class="star">★</span>`
+          : ""
+        }
+
+        ${escapeHTML(message.time)}
+
+        ${
+          message.from==="me"
+          ? `<span class="ticks">✓✓</span>`
+          : ""
+        }
+
+      </div>
+
+      <div
+        class="message-menu"
+        id="menu-${message.id}"
+      >
+
+        <button
+          onclick="favoriteMessage(${message.id})"
+        >
+          ${
+            message.favorite
+            ? "☆ Hapus favorit"
+            : "⭐ Favorit"
+          }
+        </button>
+
+        <button
+          onclick="deleteMessage(${message.id})"
+        >
+          🗑️ Hapus pesan
+        </button>
+
+      </div>
+
+    `;
+
+    bubble.onclick=function(event){
+
+      event.stopPropagation();
+
+      closeAllMenus();
+
+      const menu =
+        document.getElementById(
+          `menu-${message.id}`
+        );
+
+      menu.classList.toggle("show");
+
+    };
+
+    row.appendChild(bubble);
+
+    container.appendChild(row);
+
+  });
+
+  container.scrollTop =
+    container.scrollHeight;
+
+}
+
+
+/* ================= SEND ================= */
+
+function sendMessage(){
+
+  if(!activeChat)return;
+
+  const input =
+    document.getElementById("messageInput");
+
+  const text=input.value.trim();
+
+  if(!text)return;
+
+  chats[activeChat].messages.push({
+
+    id:Date.now(),
+
+    from:"me",
+
+    text:text,
+
+    time:currentTime(),
+
+    favorite:false
+
+  });
+
+  saveChats();
+
+  input.value="";
+
+  renderMessages();
+
+  renderChatList();
+
+  simulateReply();
+
+}
+
+
+/* ================= AUTO REPLY ================= */
+
+function simulateReply(){
+
+  const id=activeChat;
+
+  const chat=chats[id];
+
+  if(!chat)return;
+
+  const typing =
+    document.getElementById("typing");
+
+  typing.classList.add("show");
+
+  chat.status="sedang mengetik...";
+
+  document.getElementById("chatStatus")
+    .textContent=chat.status;
+
+  const replies=[
+
+    "Siap bosss 🔥",
+
+    "Mantap 😎",
+
+    "Oke, lanjut gas!",
+
+    "Wah keren banget!",
+
+    "Siap saya cek dulu 👍",
+
+    "Hehe siap 😂",
+
+    "Bagus bos 🚀",
+
+    "Oke, aman!"
+
+  ];
+
+  setTimeout(()=>{
+
+    if(!chats[id])return;
+
+    const reply =
+      replies[
+        Math.floor(
+          Math.random()*replies.length
+        )
+      ];
+
+    chats[id].messages.push({
+
+      id:Date.now(),
+
+      from:"other",
+
+      text:reply,
+
+      time:currentTime(),
+
+      favorite:false
+
+    });
+
+    chats[id].status="online";
+
+    typing.classList.remove("show");
+
+    if(activeChat===id){
+
+      document.getElementById("chatStatus")
+        .textContent="online";
+
+      renderMessages();
+
+    }
 
     saveChats();
 
-    closeModal();
-
     renderChatList();
 
-    showToast("Semua pesan berhasil dihapus 🗑️");
+  },1200+Math.random()*1800);
 
-  }
-
-
-  /* ================= MODAL ================= */
-
-  function openModal(
-    title,
-    text,
-    confirm = false,
-    action = null
-  ) {
-
-    document.getElementById("modalTitle").textContent = title;
-
-    document.getElementById("modalText").textContent = text;
-
-    document.getElementById("modalConfirm").style.display =
-      confirm ? "block" : "none";
-
-    modalAction = action;
-
-    document.getElementById("modal")
-      .classList.add("show");
-
-  }
+}
 
 
-  function closeModal() {
+/* ================= ENTER ================= */
 
-    document.getElementById("modal")
-      .classList.remove("show");
+document.getElementById("messageInput")
+.addEventListener(
+  "keydown",
+  function(event){
 
-    modalAction = null;
+    if(event.key==="Enter"){
 
-  }
+      event.preventDefault();
 
-
-  function confirmAction() {
-
-    if (typeof modalAction === "function") {
-
-      modalAction();
+      sendMessage();
 
     }
 
   }
+);
 
 
-  /* ================= INFO ================= */
+/* ================= FAVORITE ================= */
 
-  function showInfo() {
+function favoriteMessage(id){
 
-    openModal(
-      "Alfa Chat V3",
-      "Alfa Chat adalah simulasi aplikasi chat berbasis HTML, CSS, dan JavaScript. Data pesan disimpan secara lokal di browser."
+  if(!activeChat)return;
+
+  const message =
+    chats[activeChat].messages.find(
+      m=>m.id===id
     );
 
-  }
+  if(!message)return;
+
+  message.favorite=!message.favorite;
+
+  saveChats();
+
+  renderMessages();
+
+  showToast(
+    message.favorite
+    ? "Pesan ditambahkan ke favorit ⭐"
+    : "Pesan dihapus dari favorit"
+  );
+
+}
 
 
-  function showAbout() {
+/* ================= DELETE MESSAGE ================= */
 
-    openModal(
-      "Tentang Alfa Chat",
-      "Versi 3.0 — Project latihan dan portfolio Alfa Design. Belum menggunakan server atau database online."
+function deleteMessage(id){
+
+  if(!activeChat)return;
+
+  chats[activeChat].messages =
+    chats[activeChat].messages.filter(
+      m=>m.id!==id
     );
 
-  }
+  saveChats();
 
-
-  /* ================= TOAST ================= */
-
-  let toastTimer;
-
-  function showToast(text) {
-
-    const toast =
-      document.getElementById("toast");
-
-    toast.textContent = text;
-
-    toast.classList.add("show");
-
-    clearTimeout(toastTimer);
-
-    toastTimer = setTimeout(() => {
-
-      toast.classList.remove("show");
-
-    }, 2200);
-
-  }
-
-
-  /* ================= SECURITY ================= */
-
-  function escapeHTML(value) {
-
-    return String(value)
-
-      .replace(/&/g, "&amp;")
-
-      .replace(/</g, "&lt;")
-
-      .replace(/>/g, "&gt;")
-
-      .replace(/"/g, "&quot;")
-
-      .replace(/'/g, "&#039;");
-
-  }
-
-
-  /* ================= INITIALIZE ================= */
-
-  loadDarkMode();
+  renderMessages();
 
   renderChatList();
 
+  showToast("Pesan dihapus 🗑️");
+
+}
+
+
+/* ================= PIN CHAT ================= */
+
+function togglePin(id){
+
+  if(!chats[id])return;
+
+  chats[id].pinned =
+    !chats[id].pinned;
+
+  saveChats();
+
+  renderChatList();
+
+  showToast(
+    chats[id].pinned
+    ? "Chat disematkan 📌"
+    : "Chat dilepas"
+  );
+
+}
+
+
+/* ================= EMOJI ================= */
+
+function toggleEmoji(){
+
+  document.getElementById("emojiPanel")
+    .classList.toggle("show");
+
+  document.getElementById("extraMenu")
+    .classList.remove("show");
+
+}
+
+
+function insertEmoji(emoji){
+
+  const input =
+    document.getElementById("messageInput");
+
+  input.value+=emoji;
+
+  input.focus();
+
+}
+
+
+function toggleExtra(){
+
+  document.getElementById("extraMenu")
+    .classList.toggle("show");
+
+  document.getElementById("emojiPanel")
+    .classList.remove("show");
+
+}
+
+
+function fakeAttachment(name){
+
+  closePanels();
+
+  showToast(
+    `${name} adalah fitur simulasi 📎`
+  );
+
+}
+
+
+function closePanels(){
+
+  document.getElementById("emojiPanel")
+    .classList.remove("show");
+
+  document.getElementById("extraMenu")
+    .classList.remove("show");
+
+  closeAllMenus();
+
+}
+
+
+function closeAllMenus(){
+
+  document.querySelectorAll(".message-menu")
+    .forEach(
+      menu=>menu.classList.remove("show")
+    );
+
+}
+
+
+/* ================= NAV ================= */
+
+function showHome(){
+
+  document.getElementById("homeScreen")
+    .style.display="block";
+
+  document.getElementById("settingsScreen")
+    .classList.remove("active");
+
+  document.getElementById("navChat")
+    .classList.add("active");
+
+  document.getElementById("navSettings")
+    .classList.remove("active");
+
+  renderChatList();
+
+}
+
+
+function showSettings(){
+
+  document.getElementById("homeScreen")
+    .style.display="none";
+
+  document.getElementById("settingsScreen")
+    .classList.add("active");
+
+  document.getElementById("navChat")
+    .classList.remove("active");
+
+  document.getElementById("navSettings")
+    .classList.add("active");
+
+  updateDarkToggle();
+
+  updateProfileUI();
+
+}
+
+
+function showContacts(){
+
+  showToast(
+    "Kontak Alfa Chat masih mode simulasi 👥"
+  );
+
+}
+
+
+/* ================= DARK MODE ================= */
+
+function toggleDarkMode(){
+
+  document.body.classList.toggle("dark");
+
+  const enabled =
+    document.body.classList.contains("dark");
+
+  localStorage.setItem(
+    DARK_KEY,
+    enabled ? "1" : "0"
+  );
+
+  updateDarkToggle();
+
+}
+
+
+function updateDarkToggle(){
+
+  const toggle =
+    document.getElementById("darkToggle");
+
+  if(!toggle)return;
+
+  toggle.classList.toggle(
+    "on",
+    document.body.classList.contains("dark")
+  );
+
+}
+
+
+function loadDarkMode(){
+
+  const enabled =
+    localStorage.getItem(DARK_KEY)==="1";
+
+  document.body.classList.toggle(
+    "dark",
+    enabled
+  );
+
+  updateDarkToggle();
+
+}
+
+
+/* ================= EDIT PROFILE ================= */
+
+function editProfile(){
+
+  openModal(
+    "Edit Profil",
+    "Masukkan nama baru untuk profil Alfa.",
+    true,
+    saveEditedProfile,
+    true
+  );
+
+}
+
+
+function saveEditedProfile(){
+
+  const input =
+    document.getElementById("modalInput");
+
+  const newName =
+    input.value.trim();
+
+  if(!newName){
+
+    showToast("Nama tidak boleh kosong.");
+
+    return;
+
+  }
+
+  profile.name=newName;
+
+  saveProfile();
+
+  updateProfileUI();
+
+  closeModal();
+
+  showToast("Profil berhasil diperbarui 👤");
+
+}
+
+
+/* ================= CLEAR ================= */
+
+function confirmClearAll(){
+
+  openModal(
+    "Hapus Semua Data?",
+    "Semua chat, favorit, dan data lokal Alfa Chat akan dihapus.",
+    true,
+    clearAllData
+  );
+
+}
+
+
+function clearAllData(){
+
+  localStorage.removeItem(STORAGE_KEY);
+
+  chats=
+    JSON.parse(
+      JSON.stringify(defaultChats)
+    );
+
+  saveChats();
+
+  closeModal();
+
+  renderChatList();
+
+  showToast(
+    "Semua data berhasil dihapus 🗑️"
+  );
+
+}
+
+
+/* ================= MODAL ================= */
+
+function openModal(
+  title,
+  text,
+  confirm=false,
+  action=null,
+  input=false
+){
+
+  document.getElementById("modalTitle")
+    .textContent=title;
+
+  document.getElementById("modalText")
+    .textContent=text;
+
+  const inputBox =
+    document.getElementById("modalInput");
+
+  inputBox.style.display =
+    input ? "block" : "none";
+
+  if(input){
+
+    inputBox.value=profile.name;
+
+  }
+
+  const confirmButton =
+    document.getElementById("modalConfirm");
+
+  confirmButton.style.display =
+    confirm ? "block" : "none";
+
+  confirmButton.textContent =
+    input ? "Simpan" : "Hapus";
+
+  modalAction=action;
+
+  document.getElementById("modal")
+    .classList.add("show");
+
+}
+
+
+function closeModal(){
+
+  document.getElementById("modal")
+    .classList.remove("show");
+
+  modalAction=null;
+
+}
+
+
+function runModalAction(){
+
+  if(typeof modalAction==="function"){
+
+    modalAction();
+
+  }
+
+}
+
+
+/* ================= INFO ================= */
+
+function showInfo(){
+
+  openModal(
+    "Alfa Chat V4",
+    "Simulasi aplikasi chat berbasis HTML, CSS, dan JavaScript. Pesan dan pengaturan disimpan secara lokal di browser."
+  );
+
+}
+
+
+function showAbout(){
+
+  openModal(
+    "Tentang Alfa Chat",
+    "Alfa Chat V4 adalah project latihan dan portfolio Alfa Design. Belum menggunakan server atau database online."
+  );
+
+}
+
+
+/* ================= TOAST ================= */
+
+let toastTimer;
+
+function showToast(text){
+
+  const toast =
+    document.getElementById("toast");
+
+  toast.textContent=text;
+
+  toast.classList.add("show");
+
+  clearTimeout(toastTimer);
+
+  toastTimer=setTimeout(
+    ()=>toast.classList.remove("show"),
+    2300
+  );
+
+}
+
+
+/* ================= SECURITY ================= */
+
+function escapeHTML(value){
+
+  return String(value)
+
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+/* ================= INIT ================= */
+
+loadDarkMode();
+
+updateProfileUI();
+
+renderChatList();
+
+
+/* ================= CLOSE PANELS ================= */
+
+document.addEventListener(
+  "click",
+  function(event){
+
+    if(
+      !event.target.closest(".message") &&
+      !event.target.closest(".emoji-panel") &&
+      !event.target.closest(".extra-menu") &&
+      !event.target.closest(".round-btn")
+    ){
+
+      closePanels();
+
+    }
+
+  }
+);
 
 </script>
 
