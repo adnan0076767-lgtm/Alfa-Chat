@@ -1,1379 +1,1971 @@
 <!DOCTYPE html>
-
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#075e54">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-```
-<title>Alfa Chat V2</title>
+  <title>Alfa Chat V3</title>
+  <meta name="description" content="Alfa Chat V3 - Simulasi aplikasi chat modern berbasis web.">
 
-<style>
+  <style>
     * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        font-family: Arial, sans-serif;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
     :root {
-        --green: #075e54;
-        --light-green: #25d366;
-        --chat-bg: #efeae2;
-        --sent: #d9fdd3;
-        --text: #111;
-        --muted: #667781;
-        --border: #e9edef;
-        --white: #fff;
+      --primary: #075e54;
+      --primary-light: #128c7e;
+      --accent: #25d366;
+      --bg: #efeae2;
+      --card: #ffffff;
+      --text: #111b21;
+      --muted: #667781;
+      --border: #e9edef;
+      --bubble-me: #d9fdd3;
+      --bubble-other: #ffffff;
+      --header: #075e54;
+      --input: #ffffff;
+      --danger: #e53935;
+    }
+
+    body.dark {
+      --bg: #111b21;
+      --card: #202c33;
+      --text: #e9edef;
+      --muted: #8696a0;
+      --border: #374045;
+      --bubble-me: #005c4b;
+      --bubble-other: #202c33;
+      --header: #202c33;
+      --input: #2a3942;
     }
 
     body {
-        background: #d9dbd5;
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      background: #d7dbd5;
+      color: var(--text);
+      min-height: 100vh;
     }
 
     button,
     input {
-        font: inherit;
+      font: inherit;
     }
 
     button {
-        cursor: pointer;
+      border: 0;
+      cursor: pointer;
     }
 
     .app {
-        width: 100%;
-        max-width: 430px;
-        min-height: 100vh;
-        background: var(--white);
-        position: relative;
-        overflow: hidden;
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      margin: auto;
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 25px rgba(0,0,0,.15);
     }
 
-    /* =========================
-       HOME
-    ========================= */
-
-    #homeScreen {
-        min-height: 100vh;
-        padding-bottom: 70px;
-    }
+    /* ================= HEADER ================= */
 
     .top-header {
-        background: var(--green);
-        color: white;
-        padding: 18px 16px 12px;
+      background: var(--header);
+      color: white;
+      padding: 18px 16px 12px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
     }
 
-    .top-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
     }
 
-    .app-title {
-        font-size: 24px;
-        font-weight: bold;
+    .brand {
+      font-size: 23px;
+      font-weight: bold;
     }
 
-    .top-actions {
-        display: flex;
-        gap: 18px;
-        font-size: 21px;
+    .header-actions {
+      display: flex;
+      gap: 6px;
     }
 
-    .icon-button {
-        background: transparent;
-        border: none;
-        color: white;
-        font-size: 20px;
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: transparent;
+      color: white;
+      font-size: 21px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .search-area {
-        background: var(--green);
-        padding: 8px 12px 12px;
+    .icon-btn:hover {
+      background: rgba(255,255,255,.15);
     }
+
+    /* ================= SEARCH ================= */
 
     .search-box {
-        background: white;
-        border-radius: 22px;
-        display: flex;
-        align-items: center;
-        padding: 0 14px;
+      margin-top: 13px;
+      background: rgba(255,255,255,.15);
+      border-radius: 22px;
+      display: flex;
+      align-items: center;
+      padding: 0 13px;
     }
 
-    .search-icon {
-        font-size: 17px;
-        color: #777;
+    .search-box span {
+      font-size: 18px;
     }
 
-    #searchInput {
-        width: 100%;
-        border: none;
-        outline: none;
-        padding: 12px 10px;
-        font-size: 14px;
+    .search-box input {
+      width: 100%;
+      background: transparent;
+      border: 0;
+      outline: none;
+      padding: 11px;
+      color: white;
     }
+
+    .search-box input::placeholder {
+      color: rgba(255,255,255,.75);
+    }
+
+    /* ================= TABS ================= */
 
     .tabs {
-        display: flex;
-        background: white;
-        border-bottom: 1px solid var(--border);
+      display: flex;
+      margin-top: 12px;
+      gap: 5px;
     }
 
     .tab {
-        flex: 1;
-        padding: 12px 5px;
-        border: none;
-        background: white;
-        color: var(--muted);
-        font-weight: bold;
+      flex: 1;
+      padding: 9px 5px;
+      border-radius: 18px;
+      background: transparent;
+      color: rgba(255,255,255,.75);
+      font-weight: bold;
+      font-size: 13px;
     }
 
     .tab.active {
-        color: var(--green);
-        border-bottom: 3px solid var(--green);
+      background: rgba(255,255,255,.18);
+      color: white;
     }
 
-    .chat-list {
-        background: white;
+    /* ================= CHAT LIST ================= */
+
+    .content {
+      padding-bottom: 75px;
+    }
+
+    .section-title {
+      padding: 15px 16px 7px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: bold;
+      text-transform: uppercase;
     }
 
     .chat-item {
-        display: flex;
-        align-items: center;
-        padding: 13px 14px;
-        border-bottom: 1px solid var(--border);
-        cursor: pointer;
+      display: flex;
+      align-items: center;
+      padding: 13px 15px;
+      gap: 12px;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: .15s;
     }
 
     .chat-item:hover {
-        background: #f5f6f6;
+      filter: brightness(.97);
     }
 
     .avatar {
-        width: 54px;
-        height: 54px;
-        min-width: 54px;
-        border-radius: 50%;
-        background: var(--light-green);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 24px;
-        margin-right: 13px;
+      width: 52px;
+      height: 52px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #128c7e, #25d366);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      font-size: 19px;
+      position: relative;
     }
 
-    .chat-content {
-        flex: 1;
-        min-width: 0;
+    .online-dot {
+      width: 13px;
+      height: 13px;
+      border: 2px solid var(--card);
+      background: #25d366;
+      border-radius: 50%;
+      position: absolute;
+      right: 0;
+      bottom: 1px;
+    }
+
+    .chat-info {
+      flex: 1;
+      min-width: 0;
     }
 
     .chat-top {
-        display: flex;
-        justify-content: space-between;
-        gap: 10px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
     }
 
     .chat-name {
-        font-weight: bold;
-        font-size: 16px;
+      font-weight: bold;
+      font-size: 16px;
     }
 
     .chat-time {
-        color: var(--muted);
-        font-size: 11px;
-        white-space: nowrap;
+      color: var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
     }
 
     .chat-preview {
-        margin-top: 5px;
-        color: var(--muted);
-        font-size: 14px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .empty-message {
-        padding: 35px 20px;
-        text-align: center;
-        color: var(--muted);
-        display: none;
+    .unread {
+      min-width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 7px;
     }
 
-    /* =========================
-       BOTTOM NAV
-    ========================= */
+    /* ================= BOTTOM NAV ================= */
 
     .bottom-nav {
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-        max-width: 430px;
-        height: 68px;
-        background: white;
-        border-top: 1px solid var(--border);
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        z-index: 20;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      max-width: 480px;
+      height: 68px;
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      display: flex;
+      z-index: 30;
     }
 
-    .nav-button {
-        border: none;
-        background: transparent;
-        color: var(--muted);
-        text-align: center;
-        font-size: 12px;
+    .nav-btn {
+      flex: 1;
+      background: transparent;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-size: 11px;
     }
 
-    .nav-button.active {
-        color: var(--green);
-        font-weight: bold;
+    .nav-btn span:first-child {
+      font-size: 22px;
     }
 
-    .nav-icon {
-        font-size: 21px;
-        margin-bottom: 3px;
+    .nav-btn.active {
+      color: var(--primary-light);
+      font-weight: bold;
     }
 
-    /* =========================
-       CHAT SCREEN
-    ========================= */
+    /* ================= CHAT SCREEN ================= */
 
-    #chatScreen {
-        display: none;
-        min-height: 100vh;
-        background: var(--chat-bg);
-        position: relative;
+    .chat-screen {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 100;
+    }
+
+    .chat-screen.active {
+      display: flex;
+      flex-direction: column;
     }
 
     .chat-header {
-        height: 64px;
-        background: var(--green);
-        color: white;
-        display: flex;
-        align-items: center;
-        padding: 8px 10px;
+      height: 66px;
+      background: var(--header);
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
     }
 
-    .back-button {
-        border: none;
-        background: transparent;
-        color: white;
-        font-size: 27px;
-        margin-right: 8px;
+    .back-btn {
+      width: 38px;
+      height: 42px;
+      background: transparent;
+      color: white;
+      font-size: 25px;
     }
 
-    .contact-avatar {
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
-        background: var(--light-green);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 10px;
+    .chat-header-avatar {
+      width: 43px;
+      height: 43px;
+      border-radius: 50%;
+      background: linear-gradient(135deg,#128c7e,#25d366);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
     }
 
-    .contact-info {
-        flex: 1;
+    .chat-header-info {
+      flex: 1;
+      min-width: 0;
     }
 
-    .contact-name {
-        font-weight: bold;
-        font-size: 16px;
+    .chat-header-name {
+      font-weight: bold;
+      font-size: 15px;
     }
 
-    .contact-status {
-        font-size: 12px;
-        opacity: .85;
-        margin-top: 3px;
+    .chat-status {
+      font-size: 11px;
+      opacity: .8;
+      margin-top: 2px;
     }
 
-    .header-action {
-        border: none;
-        background: transparent;
-        color: white;
-        font-size: 20px;
-        margin-left: 14px;
+    .chat-header-actions {
+      display: flex;
+      gap: 3px;
     }
+
+    .chat-header-actions button {
+      width: 36px;
+      height: 40px;
+      background: transparent;
+      color: white;
+      font-size: 19px;
+      border-radius: 50%;
+    }
+
+    .chat-header-actions button:hover {
+      background: rgba(255,255,255,.15);
+    }
+
+    /* ================= MESSAGES ================= */
 
     .messages {
-        height: calc(100vh - 124px);
-        overflow-y: auto;
-        padding: 16px 12px 20px;
-        background-color: var(--chat-bg);
-        background-image:
-            radial-gradient(#d8d0c5 1px, transparent 1px);
-        background-size: 18px 18px;
+      flex: 1;
+      overflow-y: auto;
+      padding: 18px 10px 10px;
+      background:
+        radial-gradient(rgba(0,0,0,.04) 1px, transparent 1px),
+        var(--bg);
+      background-size: 15px 15px;
+    }
+
+    .date-label {
+      width: max-content;
+      margin: 0 auto 15px;
+      background: rgba(255,255,255,.7);
+      color: #667781;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+    }
+
+    body.dark .date-label {
+      background: #202c33;
     }
 
     .message-row {
-        display: flex;
-        margin-bottom: 8px;
-        clear: both;
+      display: flex;
+      margin-bottom: 7px;
     }
 
-    .message-row.sent-row {
-        justify-content: flex-end;
+    .message-row.me {
+      justify-content: flex-end;
     }
 
     .message {
-        max-width: 78%;
-        padding: 8px 10px 6px;
-        border-radius: 8px;
-        font-size: 14px;
-        line-height: 1.4;
-        box-shadow: 0 1px 1px rgba(0,0,0,.08);
+      max-width: 78%;
+      padding: 8px 9px 5px;
+      border-radius: 9px;
+      background: var(--bubble-other);
+      box-shadow: 0 1px 1px rgba(0,0,0,.08);
+      position: relative;
     }
 
-    .received {
-        background: white;
+    .message-row.me .message {
+      background: var(--bubble-me);
+      border-top-right-radius: 2px;
     }
 
-    .sent {
-        background: var(--sent);
+    .message-row.other .message {
+      border-top-left-radius: 2px;
     }
 
-    .message-time {
-        font-size: 10px;
-        color: var(--muted);
-        text-align: right;
-        margin-top: 3px;
+    .message-text {
+      font-size: 14px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      padding-right: 45px;
     }
 
-    .message-input-area {
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-        max-width: 430px;
-        background: #f0f2f5;
-        padding: 8px;
-        display: flex;
-        align-items: center;
-        gap: 7px;
-        z-index: 25;
+    .message-meta {
+      float: right;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      margin-left: 7px;
+      margin-top: 4px;
+      font-size: 10px;
+      color: var(--muted);
     }
 
-    .emoji-button,
-    .attach-button {
-        border: none;
-        background: transparent;
-        font-size: 22px;
+    .ticks {
+      color: #53bdeb;
+      font-weight: bold;
     }
 
-    .input-wrapper {
-        flex: 1;
-        background: white;
-        border-radius: 22px;
-        display: flex;
-        align-items: center;
+    .message-menu {
+      position: absolute;
+      right: 5px;
+      top: 28px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 5px 18px rgba(0,0,0,.2);
+      display: none;
+      z-index: 10;
+      min-width: 125px;
+      overflow: hidden;
     }
 
-    #messageInput {
-        width: 100%;
-        border: none;
-        outline: none;
-        padding: 12px 15px;
-        border-radius: 22px;
+    .message-menu.show {
+      display: block;
     }
 
-    .send-button {
-        width: 45px;
-        height: 45px;
-        border-radius: 50%;
-        border: none;
-        background: var(--light-green);
-        color: white;
-        font-size: 18px;
+    .message-menu button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      text-align: left;
+      background: transparent;
+      color: var(--text);
     }
 
-    /* =========================
-       SETTINGS
-    ========================= */
-
-    .settings-screen {
-        display: none;
-        min-height: 100vh;
-        background: #f5f6f6;
+    .message-menu button:hover {
+      background: rgba(0,0,0,.06);
     }
 
-    .settings-header {
-        background: var(--green);
-        color: white;
-        padding: 20px 16px;
-        font-size: 21px;
-        font-weight: bold;
+    /* ================= TYPING ================= */
+
+    .typing {
+      display: none;
+      padding: 4px 13px 7px;
+      color: var(--muted);
+      font-size: 11px;
+      background: var(--bg);
+    }
+
+    .typing.show {
+      display: block;
+    }
+
+    /* ================= INPUT ================= */
+
+    .chat-input-area {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px;
+      background: var(--bg);
+    }
+
+    .input-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      background: var(--input);
+      border-radius: 23px;
+      min-height: 46px;
+      padding: 0 7px;
+    }
+
+    .input-wrap button {
+      width: 35px;
+      height: 35px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 21px;
+      border-radius: 50%;
+    }
+
+    .input-wrap input {
+      flex: 1;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--text);
+      padding: 9px 5px;
+    }
+
+    .send-btn {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      font-size: 20px;
+    }
+
+    /* ================= SETTINGS ================= */
+
+    .settings {
+      display: none;
+    }
+
+    .settings.active {
+      display: block;
     }
 
     .profile-card {
-        background: white;
-        padding: 20px;
-        display: flex;
-        align-items: center;
-        border-bottom: 1px solid var(--border);
+      background: var(--card);
+      padding: 22px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      border-bottom: 1px solid var(--border);
     }
 
     .profile-avatar {
-        width: 65px;
-        height: 65px;
-        border-radius: 50%;
-        background: var(--light-green);
-        color: white;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 30px;
-        margin-right: 15px;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: linear-gradient(135deg,#075e54,#25d366);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 26px;
+      font-weight: bold;
+    }
+
+    .profile-name {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .profile-status {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 5px;
     }
 
     .setting-item {
-        background: white;
-        padding: 17px;
-        border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 16px;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .setting-icon {
+      width: 35px;
+      text-align: center;
+      font-size: 22px;
+    }
+
+    .setting-info {
+      flex: 1;
     }
 
     .setting-title {
-        font-weight: bold;
+      font-weight: bold;
+      font-size: 14px;
     }
 
-    .setting-description {
-        color: var(--muted);
-        font-size: 13px;
-        margin-top: 5px;
+    .setting-desc {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 3px;
     }
 
-    /* =========================
-       DARK MODE
-    ========================= */
-
-    body.dark {
-        background: #111b21;
+    .toggle {
+      width: 47px;
+      height: 25px;
+      border-radius: 20px;
+      background: #aeb7bd;
+      padding: 3px;
+      transition: .2s;
     }
 
-    body.dark .app,
-    body.dark .chat-list,
-    body.dark .tabs,
-    body.dark .tab,
-    body.dark .bottom-nav,
-    body.dark .setting-item,
-    body.dark .profile-card {
-        background: #111b21;
-        color: #e9edef;
+    .toggle::after {
+      content: "";
+      display: block;
+      width: 19px;
+      height: 19px;
+      border-radius: 50%;
+      background: white;
+      transition: .2s;
     }
 
-    body.dark .chat-item,
-    body.dark .setting-item,
-    body.dark .profile-card {
-        border-color: #26343b;
+    .toggle.on {
+      background: var(--accent);
     }
 
-    body.dark .chat-preview,
-    body.dark .chat-time,
-    body.dark .setting-description {
-        color: #aebac1;
+    .toggle.on::after {
+      transform: translateX(22px);
     }
 
-    body.dark .search-box,
-    body.dark #messageInput {
-        background: #202c33;
-        color: white;
+    .danger {
+      color: var(--danger);
     }
 
-    body.dark .messages {
-        background-color: #0b141a;
+    /* ================= MODAL ================= */
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.55);
+      z-index: 300;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
 
-    body.dark .received {
-        background: #202c33;
-        color: white;
+    .modal.show {
+      display: flex;
     }
 
-    body.dark .sent {
-        background: #005c4b;
-        color: white;
+    .modal-box {
+      width: 100%;
+      max-width: 360px;
+      background: var(--card);
+      color: var(--text);
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 15px 50px rgba(0,0,0,.3);
     }
 
-    body.dark .message-input-area {
-        background: #202c33;
+    .modal-box h3 {
+      margin-bottom: 10px;
     }
 
-    /* =========================
-       RESPONSIVE
-    ========================= */
-
-    @media (min-width: 600px) {
-        .app {
-            margin-top: 20px;
-            min-height: calc(100vh - 40px);
-            border-radius: 8px;
-            box-shadow: 0 3px 20px rgba(0,0,0,.15);
-        }
-
-        .bottom-nav,
-        .message-input-area {
-            position: fixed;
-        }
+    .modal-box p {
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 14px;
     }
-</style>
-```
 
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .modal-actions button {
+      padding: 9px 14px;
+      border-radius: 8px;
+      background: var(--primary-light);
+      color: white;
+    }
+
+    .modal-actions .cancel {
+      background: transparent;
+      color: var(--muted);
+    }
+
+    /* ================= EMPTY ================= */
+
+    .empty {
+      text-align: center;
+      padding: 50px 20px;
+      color: var(--muted);
+    }
+
+    .empty-icon {
+      font-size: 45px;
+      margin-bottom: 10px;
+    }
+
+    /* ================= TOAST ================= */
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 85px;
+      transform: translate(-50%, 20px);
+      background: #323232;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 20px;
+      font-size: 13px;
+      opacity: 0;
+      pointer-events: none;
+      transition: .25s;
+      z-index: 500;
+      max-width: 90%;
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    /* ================= DESKTOP ================= */
+
+    @media (min-width: 700px) {
+      .app {
+        min-height: 100vh;
+      }
+
+      .chat-screen {
+        width: 480px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+    }
+  </style>
 </head>
 
 <body>
 
 <div class="app">
 
-```
-<!-- =========================
-     HOME SCREEN
-========================= -->
+  <!-- ================= HOME ================= -->
 
-<div id="homeScreen">
+  <div id="homeScreen">
 
     <header class="top-header">
-        <div class="top-row">
-            <div class="app-title">Alfa Chat</div>
 
-            <div class="top-actions">
-                <button class="icon-button" onclick="focusSearch()">🔍</button>
-                <button class="icon-button" onclick="showInfo()">⋮</button>
-            </div>
+      <div class="header-row">
+        <div class="brand">Alfa Chat</div>
+
+        <div class="header-actions">
+          <button class="icon-btn" onclick="focusSearch()" title="Cari">🔍</button>
+          <button class="icon-btn" onclick="showInfo()" title="Info">⋮</button>
         </div>
+      </div>
+
+      <div class="search-box">
+        <span>🔎</span>
+        <input
+          id="searchInput"
+          type="text"
+          placeholder="Cari kontak..."
+          oninput="searchChats()"
+        >
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" onclick="setTab(this,'all')">Semua</button>
+        <button class="tab" onclick="setTab(this,'unread')">Belum Dibaca</button>
+        <button class="tab" onclick="setTab(this,'groups')">Grup</button>
+      </div>
+
     </header>
 
-    <div class="search-area">
-        <div class="search-box">
-            <span class="search-icon">🔍</span>
+    <main class="content">
 
-            <input
-                id="searchInput"
-                type="text"
-                placeholder="Cari chat..."
-                oninput="searchChats()"
-            >
-        </div>
-    </div>
+      <div class="section-title">Percakapan</div>
 
-    <div class="tabs">
-        <button class="tab active">Chat</button>
-        <button class="tab">Status</button>
-        <button class="tab">Panggilan</button>
-    </div>
+      <div id="chatList"></div>
 
-    <div class="chat-list" id="chatList">
+    </main>
 
-        <div
-            class="chat-item"
-            data-name="Budi"
-            onclick="openChat('Budi')"
-        >
-            <div class="avatar">👤</div>
-
-            <div class="chat-content">
-                <div class="chat-top">
-                    <div class="chat-name">Budi</div>
-                    <div class="chat-time">10:30</div>
-                </div>
-
-                <div
-                    class="chat-preview"
-                    id="preview-Budi"
-                >
-                    Halo, apa kabar?
-                </div>
-            </div>
-        </div>
+  </div>
 
 
-        <div
-            class="chat-item"
-            data-name="Andi"
-            onclick="openChat('Andi')"
-        >
-            <div class="avatar">👤</div>
+  <!-- ================= SETTINGS ================= -->
 
-            <div class="chat-content">
-                <div class="chat-top">
-                    <div class="chat-name">Andi</div>
-                    <div class="chat-time">09:15</div>
-                </div>
+  <div id="settingsScreen" class="settings">
 
-                <div
-                    class="chat-preview"
-                    id="preview-Andi"
-                >
-                    Besok jadi?
-                </div>
-            </div>
-        </div>
+    <header class="top-header">
+      <div class="header-row">
+        <div class="brand">Pengaturan</div>
+      </div>
+    </header>
 
+    <main class="content">
 
-        <div
-            class="chat-item"
-            data-name="Siti"
-            onclick="openChat('Siti')"
-        >
-            <div class="avatar">👤</div>
-
-            <div class="chat-content">
-                <div class="chat-top">
-                    <div class="chat-name">Siti</div>
-                    <div class="chat-time">08:45</div>
-                </div>
-
-                <div
-                    class="chat-preview"
-                    id="preview-Siti"
-                >
-                    Oke 👍
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <div
-        id="emptySearch"
-        class="empty-message"
-    >
-        Chat tidak ditemukan.
-    </div>
-
-</div>
-
-
-<!-- =========================
-     CHAT SCREEN
-========================= -->
-
-<div id="chatScreen">
-
-    <div class="chat-header">
-
-        <button
-            class="back-button"
-            onclick="closeChat()"
-        >
-            ←
-        </button>
-
-        <div class="contact-avatar">
-            👤
-        </div>
-
-        <div class="contact-info">
-            <div
-                id="contactName"
-                class="contact-name"
-            >
-                Budi
-            </div>
-
-            <div
-                id="contactStatus"
-                class="contact-status"
-            >
-                online
-            </div>
-        </div>
-
-        <button
-            class="header-action"
-            onclick="showInfo()"
-        >
-            📞
-        </button>
-
-        <button
-            class="header-action"
-            onclick="showInfo()"
-        >
-            ⋮
-        </button>
-
-    </div>
-
-
-    <div
-        id="messages"
-        class="messages"
-    >
-    </div>
-
-
-    <div class="message-input-area">
-
-        <button
-            class="emoji-button"
-            onclick="addEmoji()"
-        >
-            😊
-        </button>
-
-        <button
-            class="attach-button"
-            onclick="showInfo()"
-        >
-            📎
-        </button>
-
-        <div class="input-wrapper">
-
-            <input
-                id="messageInput"
-                type="text"
-                placeholder="Ketik pesan..."
-                autocomplete="off"
-                onkeydown="handleEnter(event)"
-            >
-
-        </div>
-
-        <button
-            class="send-button"
-            onclick="sendMessage()"
-        >
-            ➤
-        </button>
-
-    </div>
-
-</div>
-
-
-<!-- =========================
-     SETTINGS SCREEN
-========================= -->
-
-<div
-    id="settingsScreen"
-    class="settings-screen"
->
-
-    <div class="settings-header">
-        Pengaturan
-    </div>
-
-    <div class="profile-card">
-
-        <div class="profile-avatar">
-            👤
-        </div>
+      <div class="profile-card">
+        <div class="profile-avatar">A</div>
 
         <div>
-            <strong>Pengguna Alfa</strong>
-            <div class="setting-description">
-                Akun simulasi Alfa Chat
-            </div>
+          <div class="profile-name">Alfa</div>
+          <div class="profile-status">Halo! Saya menggunakan Alfa Chat.</div>
         </div>
+      </div>
+
+      <div class="section-title">Aplikasi</div>
+
+      <div class="setting-item" onclick="toggleDarkMode()">
+        <div class="setting-icon">🌙</div>
+
+        <div class="setting-info">
+          <div class="setting-title">Mode Gelap</div>
+          <div class="setting-desc">Gunakan tampilan gelap</div>
+        </div>
+
+        <div id="darkToggle" class="toggle"></div>
+      </div>
+
+      <div class="setting-item" onclick="showToast('Notifikasi simulasi aktif 🔔')">
+        <div class="setting-icon">🔔</div>
+
+        <div class="setting-info">
+          <div class="setting-title">Notifikasi</div>
+          <div class="setting-desc">Kelola notifikasi Alfa Chat</div>
+        </div>
+      </div>
+
+      <div class="setting-item" onclick="showToast('Fitur keamanan simulasi')">
+        <div class="setting-icon">🔐</div>
+
+        <div class="setting-info">
+          <div class="setting-title">Privasi & Keamanan</div>
+          <div class="setting-desc">Pengaturan privasi aplikasi</div>
+        </div>
+      </div>
+
+      <div class="section-title">Data</div>
+
+      <div class="setting-item" onclick="confirmClear()">
+        <div class="setting-icon danger">🗑️</div>
+
+        <div class="setting-info">
+          <div class="setting-title danger">Hapus Semua Pesan</div>
+          <div class="setting-desc">Menghapus data chat dari browser</div>
+        </div>
+      </div>
+
+      <div class="section-title">Tentang</div>
+
+      <div class="setting-item" onclick="showAbout()">
+        <div class="setting-icon">ℹ️</div>
+
+        <div class="setting-info">
+          <div class="setting-title">Tentang Alfa Chat</div>
+          <div class="setting-desc">Versi 3.0 • Simulasi Web App</div>
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+
+
+  <!-- ================= CHAT SCREEN ================= -->
+
+  <div id="chatScreen" class="chat-screen">
+
+    <header class="chat-header">
+
+      <button class="back-btn" onclick="closeChat()">‹</button>
+
+      <div id="chatAvatar" class="chat-header-avatar">B</div>
+
+      <div class="chat-header-info">
+        <div id="chatName" class="chat-header-name">Budi</div>
+        <div id="chatStatus" class="chat-status">online</div>
+      </div>
+
+      <div class="chat-header-actions">
+        <button onclick="showToast('Panggilan suara adalah simulasi 📞')">📞</button>
+        <button onclick="showToast('Menu chat simulasi ⋮')">⋮</button>
+      </div>
+
+    </header>
+
+    <div id="messages" class="messages"></div>
+
+    <div id="typing" class="typing">
+      sedang mengetik...
+    </div>
+
+    <div class="chat-input-area">
+
+      <div class="input-wrap">
+
+        <button onclick="addEmoji()">😊</button>
+
+        <input
+          id="messageInput"
+          type="text"
+          placeholder="Ketik pesan"
+          autocomplete="off"
+        >
+
+        <button onclick="showToast('Lampiran adalah simulasi 📎')">📎</button>
+
+      </div>
+
+      <button class="send-btn" onclick="sendMessage()">➤</button>
 
     </div>
 
-    <div class="setting-item">
-        <div class="setting-title">
-            🔔 Notifikasi
-        </div>
+  </div>
 
-        <div class="setting-description">
-            Pengaturan notifikasi simulasi
-        </div>
-    </div>
 
-    <div
-        class="setting-item"
-        onclick="toggleDarkMode()"
-        style="cursor:pointer;"
-    >
-        <div class="setting-title">
-            🌙 Mode Gelap
-        </div>
+  <!-- ================= BOTTOM NAV ================= -->
 
-        <div class="setting-description">
-            Tekan untuk mengubah tampilan
-        </div>
-    </div>
+  <nav class="bottom-nav">
 
-    <div
-        class="setting-item"
-        onclick="clearAllMessages()"
-        style="cursor:pointer;"
-    >
-        <div class="setting-title">
-            🗑️ Hapus Data Chat
-        </div>
+    <button id="navChat" class="nav-btn active" onclick="showHome()">
+      <span>💬</span>
+      Chat
+    </button>
 
-        <div class="setting-description">
-            Menghapus pesan simulasi dari browser
-        </div>
-    </div>
+    <button class="nav-btn" onclick="showContacts()">
+      <span>👥</span>
+      Kontak
+    </button>
 
-    <div class="setting-item">
-        <div class="setting-title">
-            ℹ️ Tentang Alfa Chat
-        </div>
+    <button id="navSettings" class="nav-btn" onclick="showSettings()">
+      <span>⚙️</span>
+      Pengaturan
+    </button>
 
-        <div class="setting-description">
-            Alfa Chat V2 — proyek simulasi aplikasi chat.
-        </div>
-    </div>
+  </nav>
 
 </div>
 
 
-<!-- =========================
-     BOTTOM NAVIGATION
-========================= -->
+<!-- ================= MODAL ================= -->
 
-<nav class="bottom-nav">
+<div id="modal" class="modal">
 
-    <button
-        class="nav-button active"
-        onclick="showHome()"
-    >
-        <div class="nav-icon">💬</div>
-        Chat
-    </button>
+  <div class="modal-box">
 
-    <button
-        class="nav-button"
-        onclick="showInfo()"
-    >
-        <div class="nav-icon">👥</div>
-        Kontak
-    </button>
+    <h3 id="modalTitle">Informasi</h3>
 
-    <button
-        class="nav-button"
-        onclick="showSettings()"
-    >
-        <div class="nav-icon">⚙️</div>
-        Pengaturan
-    </button>
+    <p id="modalText"></p>
 
-</nav>
-```
+    <div class="modal-actions">
+
+      <button class="cancel" onclick="closeModal()">Tutup</button>
+
+      <button id="modalConfirm" style="display:none;" onclick="confirmAction()">
+        Hapus
+      </button>
+
+    </div>
+
+  </div>
 
 </div>
+
+
+<div id="toast" class="toast"></div>
+
 
 <script>
 
-    /* ==========================================
-       DATA CHAT
-    ========================================== */
+  /* =====================================================
+     ALFA CHAT V3
+     ===================================================== */
 
-    const defaultChats = {
+  const STORAGE_KEY = "alfaChatV3Messages";
+  const DARK_KEY = "alfaChatV3Dark";
 
-        Budi: [
-            {
-                type: "received",
-                text: "Halo! 👋",
-                time: "10:28"
-            },
-            {
-                type: "sent",
-                text: "Hai Budi!",
-                time: "10:29"
-            },
-            {
-                type: "received",
-                text: "Apa kabar?",
-                time: "10:30"
-            }
-        ],
+  const defaultChats = {
+    budi: {
+      id: "budi",
+      name: "Budi",
+      avatar: "B",
+      status: "online",
+      group: false,
+      unread: 0,
+      messages: [
+        {
+          id: 1,
+          from: "other",
+          text: "Halo Alfa 👋",
+          time: "09:10",
+          read: true
+        },
+        {
+          id: 2,
+          from: "me",
+          text: "Halo Budi! Apa kabar?",
+          time: "09:11",
+          read: true
+        },
+        {
+          id: 3,
+          from: "other",
+          text: "Baik bos 😎 Lagi belajar Alfa Chat?",
+          time: "09:12",
+          read: true
+        }
+      ]
+    },
 
-        Andi: [
-            {
-                type: "received",
-                text: "Besok jadi?",
-                time: "09:15"
-            }
-        ],
+    andi: {
+      id: "andi",
+      name: "Andi",
+      avatar: "A",
+      status: "terakhir dilihat baru saja",
+      group: false,
+      unread: 2,
+      messages: [
+        {
+          id: 4,
+          from: "other",
+          text: "Bro, nanti lanjut coding ya.",
+          time: "08:45",
+          read: false
+        },
+        {
+          id: 5,
+          from: "other",
+          text: "Jangan lupa cek Alfa Chat 🔥",
+          time: "08:46",
+          read: false
+        }
+      ]
+    },
 
-        Siti: [
-            {
-                type: "received",
-                text: "Oke 👍",
-                time: "08:45"
-            }
-        ]
+    siti: {
+      id: "siti",
+      name: "Siti",
+      avatar: "S",
+      status: "online",
+      group: false,
+      unread: 0,
+      messages: [
+        {
+          id: 6,
+          from: "other",
+          text: "Website-nya bagus 👍",
+          time: "Kemarin",
+          read: true
+        }
+      ]
+    },
+
+    alfagroup: {
+      id: "alfagroup",
+      name: "Alfa Design Team",
+      avatar: "AD",
+      status: "4 anggota",
+      group: true,
+      unread: 0,
+      messages: [
+        {
+          id: 7,
+          from: "other",
+          text: "Selamat datang di grup Alfa Design 🚀",
+          time: "Kemarin",
+          read: true
+        },
+        {
+          id: 8,
+          from: "me",
+          text: "Siap, kita gas proyeknya! 🔥",
+          time: "Kemarin",
+          read: true
+        }
+      ]
+    }
+  };
+
+
+  let chats = loadChats();
+  let activeChat = null;
+  let modalAction = null;
+
+
+  /* ================= STORAGE ================= */
+
+  function loadChats() {
+
+    const saved = localStorage.getItem(STORAGE_KEY);
+
+    if (saved) {
+
+      try {
+        return JSON.parse(saved);
+
+      } catch (error) {
+        console.log("Data lama rusak, memakai data default.");
+      }
+
+    }
+
+    return JSON.parse(JSON.stringify(defaultChats));
+  }
+
+
+  function saveChats() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(chats));
+  }
+
+
+  /* ================= TIME ================= */
+
+  function currentTime() {
+
+    const now = new Date();
+
+    return now.toLocaleTimeString("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+
+  }
+
+
+  /* ================= CHAT LIST ================= */
+
+  function renderChatList(filter = "") {
+
+    const list = document.getElementById("chatList");
+
+    const search = filter.toLowerCase().trim();
+
+    list.innerHTML = "";
+
+    let found = 0;
+
+    Object.values(chats).forEach(chat => {
+
+      if (
+        search &&
+        !chat.name.toLowerCase().includes(search)
+      ) {
+        return;
+      }
+
+      found++;
+
+      const messages = chat.messages || [];
+
+      const last = messages[messages.length - 1];
+
+      const preview = last
+        ? `${last.from === "me" ? "Anda: " : ""}${last.text}`
+        : "Belum ada pesan";
+
+      const item = document.createElement("div");
+
+      item.className = "chat-item";
+
+      item.dataset.name = chat.name.toLowerCase();
+
+      item.onclick = () => openChat(chat.id);
+
+      item.innerHTML = `
+        <div class="avatar">
+          ${escapeHTML(chat.avatar)}
+          ${
+            chat.status === "online"
+              ? `<span class="online-dot"></span>`
+              : ""
+          }
+        </div>
+
+        <div class="chat-info">
+
+          <div class="chat-top">
+
+            <div class="chat-name">
+              ${escapeHTML(chat.name)}
+            </div>
+
+            <div class="chat-time">
+              ${last ? escapeHTML(last.time) : ""}
+            </div>
+
+          </div>
+
+          <div class="chat-preview">
+            ${escapeHTML(preview)}
+          </div>
+
+        </div>
+
+        ${
+          chat.unread > 0
+          ? `<div class="unread">${chat.unread}</div>`
+          : ""
+        }
+
+      `;
+
+      list.appendChild(item);
+
+    });
+
+
+    if (!found) {
+
+      list.innerHTML = `
+        <div class="empty">
+
+          <div class="empty-icon">🔍</div>
+
+          <div>
+            Kontak tidak ditemukan
+          </div>
+
+        </div>
+      `;
+
+    }
+
+  }
+
+
+  /* ================= SEARCH ================= */
+
+  function searchChats() {
+
+    const input = document.getElementById("searchInput");
+
+    renderChatList(input.value);
+
+  }
+
+
+  function focusSearch() {
+
+    document.getElementById("searchInput").focus();
+
+  }
+
+
+  /* ================= TABS ================= */
+
+  function setTab(button, type) {
+
+    document.querySelectorAll(".tab")
+      .forEach(tab => tab.classList.remove("active"));
+
+    button.classList.add("active");
+
+    const list = document.getElementById("chatList");
+
+    list.innerHTML = "";
+
+    if (type === "unread") {
+
+      Object.values(chats).forEach(chat => {
+
+        if (chat.unread > 0) {
+
+          renderSingleChat(chat);
+
+        }
+
+      });
+
+      if (!list.children.length) {
+
+        list.innerHTML = `
+          <div class="empty">
+            <div class="empty-icon">✅</div>
+            Tidak ada pesan belum dibaca
+          </div>
+        `;
+
+      }
+
+      return;
+    }
+
+
+    if (type === "groups") {
+
+      Object.values(chats).forEach(chat => {
+
+        if (chat.group) {
+
+          renderSingleChat(chat);
+
+        }
+
+      });
+
+      if (!list.children.length) {
+
+        list.innerHTML = `
+          <div class="empty">
+            <div class="empty-icon">👥</div>
+            Belum ada grup
+          </div>
+        `;
+
+      }
+
+      return;
+    }
+
+
+    renderChatList();
+
+  }
+
+
+  function renderSingleChat(chat) {
+
+    const list = document.getElementById("chatList");
+
+    const messages = chat.messages || [];
+
+    const last = messages[messages.length - 1];
+
+    const preview = last
+      ? `${last.from === "me" ? "Anda: " : ""}${last.text}`
+      : "Belum ada pesan";
+
+    const item = document.createElement("div");
+
+    item.className = "chat-item";
+
+    item.onclick = () => openChat(chat.id);
+
+    item.innerHTML = `
+
+      <div class="avatar">
+
+        ${escapeHTML(chat.avatar)}
+
+        ${
+          chat.status === "online"
+          ? `<span class="online-dot"></span>`
+          : ""
+        }
+
+      </div>
+
+      <div class="chat-info">
+
+        <div class="chat-top">
+
+          <div class="chat-name">
+            ${escapeHTML(chat.name)}
+          </div>
+
+          <div class="chat-time">
+            ${last ? escapeHTML(last.time) : ""}
+          </div>
+
+        </div>
+
+        <div class="chat-preview">
+          ${escapeHTML(preview)}
+        </div>
+
+      </div>
+
+      ${
+        chat.unread > 0
+        ? `<div class="unread">${chat.unread}</div>`
+        : ""
+      }
+
+    `;
+
+    list.appendChild(item);
+
+  }
+
+
+  /* ================= OPEN CHAT ================= */
+
+  function openChat(id) {
+
+    activeChat = id;
+
+    const chat = chats[id];
+
+    if (!chat) return;
+
+    document.getElementById("chatName").textContent = chat.name;
+
+    document.getElementById("chatAvatar").textContent = chat.avatar;
+
+    document.getElementById("chatStatus").textContent = chat.status;
+
+    chat.unread = 0;
+
+    saveChats();
+
+    renderMessages();
+
+    document.getElementById("chatScreen")
+      .classList.add("active");
+
+    setTimeout(() => {
+
+      document.getElementById("messageInput").focus();
+
+    }, 150);
+
+  }
+
+
+  function closeChat() {
+
+    document.getElementById("chatScreen")
+      .classList.remove("active");
+
+    activeChat = null;
+
+    renderChatList();
+
+  }
+
+
+  /* ================= RENDER MESSAGES ================= */
+
+  function renderMessages() {
+
+    const container = document.getElementById("messages");
+
+    const chat = chats[activeChat];
+
+    if (!chat) return;
+
+    container.innerHTML = `
+      <div class="date-label">Hari ini</div>
+    `;
+
+    chat.messages.forEach(message => {
+
+      const row = document.createElement("div");
+
+      row.className =
+        `message-row ${message.from === "me" ? "me" : "other"}`;
+
+      const bubble = document.createElement("div");
+
+      bubble.className = "message";
+
+      bubble.innerHTML = `
+
+        <div class="message-text">
+          ${escapeHTML(message.text)}
+        </div>
+
+        <div class="message-meta">
+
+          ${escapeHTML(message.time)}
+
+          ${
+            message.from === "me"
+            ? `<span class="ticks">✓✓</span>`
+            : ""
+          }
+
+        </div>
+
+        ${
+          message.from === "me"
+          ? `
+            <div class="message-menu" id="menu-${message.id}">
+
+              <button onclick="deleteMessage(${message.id})">
+                🗑️ Hapus pesan
+              </button>
+
+            </div>
+          `
+          : ""
+        }
+
+      `;
+
+      if (message.from === "me") {
+
+        bubble.onclick = function(event) {
+
+          event.stopPropagation();
+
+          closeAllMessageMenus();
+
+          const menu = document.getElementById(
+            `menu-${message.id}`
+          );
+
+          if (menu) {
+            menu.classList.toggle("show");
+          }
+
+        };
+
+      }
+
+      row.appendChild(bubble);
+
+      container.appendChild(row);
+
+    });
+
+    container.scrollTop = container.scrollHeight;
+
+  }
+
+
+  /* ================= SEND ================= */
+
+  function sendMessage() {
+
+    if (!activeChat) return;
+
+    const input = document.getElementById("messageInput");
+
+    const text = input.value.trim();
+
+    if (!text) return;
+
+    const message = {
+
+      id: Date.now(),
+
+      from: "me",
+
+      text: text,
+
+      time: currentTime(),
+
+      read: true
 
     };
 
+    chats[activeChat].messages.push(message);
 
-    let chats =
-        JSON.parse(
-            localStorage.getItem("alfaChatMessages")
-        ) || defaultChats;
+    saveChats();
 
+    input.value = "";
 
-    let currentContact = null;
+    renderMessages();
 
+    renderChatList();
 
-    /* ==========================================
-       SAVE CHAT
-    ========================================== */
+    simulateReply(text);
 
-    function saveChats() {
-
-        localStorage.setItem(
-            "alfaChatMessages",
-            JSON.stringify(chats)
-        );
-
-    }
+  }
 
 
-    /* ==========================================
-       OPEN CHAT
-    ========================================== */
+  /* ================= SIMULATED REPLY ================= */
 
-    function openChat(name) {
+  function simulateReply(userText) {
 
-        currentContact = name;
+    const chatId = activeChat;
 
-        document.getElementById(
-            "homeScreen"
-        ).style.display = "none";
+    const chat = chats[chatId];
 
-        document.getElementById(
-            "settingsScreen"
-        ).style.display = "none";
+    if (!chat) return;
 
-        document.getElementById(
-            "chatScreen"
-        ).style.display = "block";
+    const typing = document.getElementById("typing");
 
-        document.getElementById(
-            "contactName"
-        ).textContent = name;
+    typing.classList.add("show");
 
-        document.getElementById(
-            "contactStatus"
-        ).textContent = "online";
+    chat.status = "sedang mengetik...";
 
-        renderMessages();
-
-        setTimeout(() => {
-
-            document
-                .getElementById("messageInput")
-                .focus();
-
-        }, 100);
-
-    }
+    document.getElementById("chatStatus").textContent =
+      "sedang mengetik...";
 
 
-    /* ==========================================
-       CLOSE CHAT
-    ========================================== */
+    const replies = [
 
-    function closeChat() {
+      "Oke 👍",
 
-        document.getElementById(
-            "chatScreen"
-        ).style.display = "none";
+      "Siap bosss 🔥",
 
-        document.getElementById(
-            "homeScreen"
-        ).style.display = "block";
+      "Mantap 😎",
 
-        currentContact = null;
+      "Wah keren!",
 
-        updatePreviews();
+      "Lanjut gas 🚀",
 
-    }
+      "Siap, saya cek dulu.",
 
+      "Bagus banget 👍",
 
-    /* ==========================================
-       RENDER MESSAGES
-    ========================================== */
+      "Hehe siap bos 😂"
 
-    function renderMessages() {
+    ];
 
-        const container =
-            document.getElementById("messages");
+    setTimeout(() => {
 
-        container.innerHTML = "";
+      if (!chats[chatId]) return;
 
-        const messages =
-            chats[currentContact] || [];
+      const reply =
+        replies[Math.floor(Math.random() * replies.length)];
 
-        messages.forEach(message => {
+      chats[chatId].messages.push({
 
-            const row =
-                document.createElement("div");
+        id: Date.now(),
 
-            row.className =
-                "message-row " +
-                (
-                    message.type === "sent"
-                    ? "sent-row"
-                    : ""
-                );
+        from: "other",
 
-            const bubble =
-                document.createElement("div");
+        text: reply,
 
-            bubble.className =
-                "message " +
-                message.type;
+        time: currentTime(),
 
-            bubble.innerHTML = `
-                <div>${escapeHTML(message.text)}</div>
-                <div class="message-time">
-                    ${message.time}
-                </div>
-            `;
+        read: true
 
-            row.appendChild(bubble);
+      });
 
-            container.appendChild(row);
+      chats[chatId].status = "online";
 
-        });
+      typing.classList.remove("show");
 
-        container.scrollTop =
-            container.scrollHeight;
+      if (activeChat === chatId) {
 
-    }
-
-
-    /* ==========================================
-       SEND MESSAGE
-    ========================================== */
-
-    function sendMessage() {
-
-        const input =
-            document.getElementById(
-                "messageInput"
-            );
-
-        const text =
-            input.value.trim();
-
-        if (!text || !currentContact) {
-            return;
-        }
-
-        const now =
-            new Date();
-
-        const time =
-            now.toLocaleTimeString(
-                "id-ID",
-                {
-                    hour: "2-digit",
-                    minute: "2-digit"
-                }
-            );
-
-        if (!chats[currentContact]) {
-            chats[currentContact] = [];
-        }
-
-        chats[currentContact].push({
-
-            type: "sent",
-
-            text: text,
-
-            time: time
-
-        });
-
-        saveChats();
-
-        input.value = "";
+        document.getElementById("chatStatus").textContent =
+          chats[chatId].status;
 
         renderMessages();
 
-        updatePreviews();
+      }
+
+      saveChats();
+
+      renderChatList();
+
+    }, 1000 + Math.random() * 1800);
+
+  }
+
+
+  /* ================= ENTER SEND ================= */
+
+  document.getElementById("messageInput")
+    .addEventListener("keydown", function(event) {
+
+      if (event.key === "Enter") {
+
+        event.preventDefault();
+
+        sendMessage();
+
+      }
+
+    });
+
+
+  /* ================= DELETE MESSAGE ================= */
+
+  function deleteMessage(id) {
+
+    if (!activeChat) return;
+
+    chats[activeChat].messages =
+      chats[activeChat].messages.filter(
+        message => message.id !== id
+      );
+
+    saveChats();
+
+    renderMessages();
+
+    renderChatList();
+
+    showToast("Pesan dihapus 🗑️");
+
+  }
+
+
+  function closeAllMessageMenus() {
+
+    document.querySelectorAll(".message-menu")
+      .forEach(menu => menu.classList.remove("show"));
+
+  }
+
+
+  document.addEventListener("click", function() {
+
+    closeAllMessageMenus();
+
+  });
+
+
+  /* ================= EMOJI ================= */
+
+  function addEmoji() {
+
+    const input = document.getElementById("messageInput");
+
+    input.value += " 😊";
+
+    input.focus();
+
+  }
+
+
+  /* ================= NAVIGATION ================= */
+
+  function showHome() {
+
+    document.getElementById("homeScreen").style.display = "block";
+
+    document.getElementById("settingsScreen")
+      .classList.remove("active");
+
+    document.getElementById("navChat")
+      .classList.add("active");
+
+    document.getElementById("navSettings")
+      .classList.remove("active");
+
+    renderChatList();
+
+  }
+
+
+  function showSettings() {
+
+    document.getElementById("homeScreen").style.display = "none";
+
+    document.getElementById("settingsScreen")
+      .classList.add("active");
+
+    document.getElementById("navChat")
+      .classList.remove("active");
+
+    document.getElementById("navSettings")
+      .classList.add("active");
+
+    updateDarkToggle();
+
+  }
+
+
+  function showContacts() {
+
+    showToast("Kontak masih dalam mode simulasi 👥");
+
+  }
+
+
+  /* ================= DARK MODE ================= */
+
+  function toggleDarkMode() {
+
+    document.body.classList.toggle("dark");
+
+    const enabled =
+      document.body.classList.contains("dark");
+
+    localStorage.setItem(DARK_KEY, enabled ? "1" : "0");
+
+    updateDarkToggle();
+
+  }
+
+
+  function updateDarkToggle() {
+
+    const toggle =
+      document.getElementById("darkToggle");
+
+    if (!toggle) return;
+
+    const enabled =
+      document.body.classList.contains("dark");
+
+    toggle.classList.toggle("on", enabled);
+
+  }
+
+
+  function loadDarkMode() {
+
+    const enabled =
+      localStorage.getItem(DARK_KEY) === "1";
+
+    document.body.classList.toggle("dark", enabled);
+
+    updateDarkToggle();
+
+  }
+
+
+  /* ================= CLEAR DATA ================= */
+
+  function confirmClear() {
+
+    openModal(
+      "Hapus Semua Pesan?",
+      "Semua pesan simulasi yang tersimpan di browser akan dihapus.",
+      true,
+      clearAllMessages
+    );
+
+  }
+
+
+  function clearAllMessages() {
+
+    localStorage.removeItem(STORAGE_KEY);
+
+    chats =
+      JSON.parse(JSON.stringify(defaultChats));
+
+    saveChats();
+
+    closeModal();
+
+    renderChatList();
+
+    showToast("Semua pesan berhasil dihapus 🗑️");
+
+  }
+
+
+  /* ================= MODAL ================= */
+
+  function openModal(
+    title,
+    text,
+    confirm = false,
+    action = null
+  ) {
+
+    document.getElementById("modalTitle").textContent = title;
+
+    document.getElementById("modalText").textContent = text;
+
+    document.getElementById("modalConfirm").style.display =
+      confirm ? "block" : "none";
+
+    modalAction = action;
+
+    document.getElementById("modal")
+      .classList.add("show");
+
+  }
+
+
+  function closeModal() {
+
+    document.getElementById("modal")
+      .classList.remove("show");
+
+    modalAction = null;
+
+  }
+
+
+  function confirmAction() {
+
+    if (typeof modalAction === "function") {
+
+      modalAction();
 
     }
 
+  }
 
-    /* ==========================================
-       ENTER TO SEND
-    ========================================== */
 
-    function handleEnter(event) {
+  /* ================= INFO ================= */
 
-        if (event.key === "Enter") {
+  function showInfo() {
 
-            event.preventDefault();
+    openModal(
+      "Alfa Chat V3",
+      "Alfa Chat adalah simulasi aplikasi chat berbasis HTML, CSS, dan JavaScript. Data pesan disimpan secara lokal di browser."
+    );
 
-            sendMessage();
+  }
 
-        }
 
-    }
+  function showAbout() {
 
+    openModal(
+      "Tentang Alfa Chat",
+      "Versi 3.0 — Project latihan dan portfolio Alfa Design. Belum menggunakan server atau database online."
+    );
 
-    /* ==========================================
-       UPDATE CHAT PREVIEW
-    ========================================== */
+  }
 
-    function updatePreviews() {
 
-        Object.keys(chats).forEach(name => {
+  /* ================= TOAST ================= */
 
-            const messages =
-                chats[name];
+  let toastTimer;
 
-            if (!messages.length) {
-                return;
-            }
+  function showToast(text) {
 
-            const last =
-                messages[messages.length - 1];
+    const toast =
+      document.getElementById("toast");
 
-            const preview =
-                document.getElementById(
-                    "preview-" + name
-                );
+    toast.textContent = text;
 
-            if (preview) {
+    toast.classList.add("show");
 
-                preview.textContent =
-                    last.text;
+    clearTimeout(toastTimer);
 
-            }
+    toastTimer = setTimeout(() => {
 
-        });
+      toast.classList.remove("show");
 
-    }
+    }, 2200);
 
+  }
 
-    /* ==========================================
-       SEARCH CHAT
-    ========================================== */
 
-    function searchChats() {
+  /* ================= SECURITY ================= */
 
-        const query =
-            document
-                .getElementById("searchInput")
-                .value
-                .toLowerCase()
-                .trim();
+  function escapeHTML(value) {
 
-        const items =
-            document.querySelectorAll(
-                ".chat-item"
-            );
+    return String(value)
 
-        let found = false;
+      .replace(/&/g, "&amp;")
 
-        items.forEach(item => {
+      .replace(/</g, "&lt;")
 
-            const name =
-                item.dataset.name.toLowerCase();
+      .replace(/>/g, "&gt;")
 
-            if (name.includes(query)) {
+      .replace(/"/g, "&quot;")
 
-                item.style.display = "flex";
+      .replace(/'/g, "&#039;");
 
-                found = true;
+  }
 
-            } else {
 
-                item.style.display = "none";
+  /* ================= INITIALIZE ================= */
 
-            }
+  loadDarkMode();
 
-        });
+  renderChatList();
 
-        document.getElementById(
-            "emptySearch"
-        ).style.display =
-            found ? "none" : "block";
-
-    }
-
-
-    /* ==========================================
-       FOCUS SEARCH
-    ========================================== */
-
-    function focusSearch() {
-
-        document
-            .getElementById("searchInput")
-            .focus();
-
-    }
-
-
-    /* ==========================================
-       EMOJI
-    ========================================== */
-
-    function addEmoji() {
-
-        const input =
-            document.getElementById(
-                "messageInput"
-            );
-
-        input.value += " 😊";
-
-        input.focus();
-
-    }
-
-
-    /* ==========================================
-       SETTINGS
-    ========================================== */
-
-    function showSettings() {
-
-        document.getElementById(
-            "homeScreen"
-        ).style.display = "none";
-
-        document.getElementById(
-            "chatScreen"
-        ).style.display = "none";
-
-        document.getElementById(
-            "settingsScreen"
-        ).style.display = "block";
-
-    }
-
-
-    /* ==========================================
-       HOME
-    ========================================== */
-
-    function showHome() {
-
-        document.getElementById(
-            "chatScreen"
-        ).style.display = "none";
-
-        document.getElementById(
-            "settingsScreen"
-        ).style.display = "none";
-
-        document.getElementById(
-            "homeScreen"
-        ).style.display = "block";
-
-        updatePreviews();
-
-    }
-
-
-    /* ==========================================
-       DARK MODE
-    ========================================== */
-
-    function toggleDarkMode() {
-
-        document.body.classList.toggle("dark");
-
-        localStorage.setItem(
-            "alfaChatDarkMode",
-            document.body.classList.contains("dark")
-        );
-
-    }
-
-
-    /* ==========================================
-       CLEAR CHAT DATA
-    ========================================== */
-
-    function clearAllMessages() {
-
-        const confirmed =
-            confirm(
-                "Hapus semua pesan simulasi?"
-            );
-
-        if (!confirmed) {
-            return;
-        }
-
-        localStorage.removeItem(
-            "alfaChatMessages"
-        );
-
-        chats =
-            JSON.parse(
-                JSON.stringify(defaultChats)
-            );
-
-        alert("Data chat berhasil direset.");
-
-        showHome();
-
-    }
-
-
-    /* ==========================================
-       INFO
-    ========================================== */
-
-    function showInfo() {
-
-        alert(
-            "Alfa Chat V2\n\n" +
-            "Ini adalah simulasi aplikasi chat " +
-            "untuk pembelajaran dan portfolio.\n\n" +
-            "Fitur online sungguhan belum digunakan."
-        );
-
-    }
-
-
-    /* ==========================================
-       SECURITY HELPER
-    ========================================== */
-
-    function escapeHTML(text) {
-
-        const div =
-            document.createElement("div");
-
-        div.textContent = text;
-
-        return div.innerHTML;
-
-    }
-
-
-    /* ==========================================
-       LOAD DARK MODE
-    ========================================== */
-
-    if (
-        localStorage.getItem(
-            "alfaChatDarkMode"
-        ) === "true"
-    ) {
-
-        document.body.classList.add("dark");
-
-    }
-
-
-    /* ==========================================
-       INITIALIZE
-    ========================================== */
-
-    updatePreviews();
 
 </script>
 
